@@ -36,4 +36,5 @@ clean:
 	rm -rf $(BUILD)
 
 run: $(TARGET)
-	qemu-system-x86_64 -kernel $(TARGET) -nographic
+	@echo "构建完成: $(TARGET)"
+	@echo "请将 build/kernel.elf 复制到 Windows QEMU 中运行"
