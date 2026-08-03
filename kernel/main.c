@@ -4,4 +4,6 @@ void start_kernel()
 {
     kprint("\n");
     kprintln("aaaaaa");
+
+    idt_init();
 }

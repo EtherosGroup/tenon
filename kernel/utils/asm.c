@@ -117,6 +117,13 @@ void asm_hlt(void)
     __asm__ volatile("hlt");
 }
 
+void asm_halt(void)
+{
+    asm_cli();
+    for (;;)
+        asm_hlt();
+}
+
 void asm_cli(void)
 {
     __asm__ volatile("cli");
@@ -306,6 +313,7 @@ void asm_cpuid(ku32 leaf, ku32 subleaf,
 }
 
 void asm_hlt(void) {}
+void asm_halt(void) { for (;;) {} }
 void asm_cli(void) {}
 void asm_sti(void) {}
 void asm_mfence(void) {}

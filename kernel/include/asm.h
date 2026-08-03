@@ -35,6 +35,7 @@ void asm_cpuid
 
 /* Instruction Wrappers */
 void asm_hlt(void);
+void asm_halt(void);
 void asm_cli(void);
 void asm_sti(void);
 void asm_mfence(void);
