@@ -34,12 +34,29 @@ void pic_eoi(ku8 irq)
     asm_outb(PIC1, PIC_EOI); // 主片
 }
 
+/**
+ * IMR (中断屏蔽寄存器) 中每一位对应一个中断源：
+ *   1 = 该中断被屏蔽 (禁止响应)
+ *   0 = 该中断未被屏蔽 (允许响应)
+ *
+ * 此函数只修改目标 IRQ 对应的位，其他位保持不变。
+ * 例如：操作 IRQ3，从 0b11101111 -> 0b11100111 (只改变 bit3)
+ *
+ * 注意：
+ *   - IRQ 0~7 使用主 PIC (端口 0x21)
+ *   - IRQ 8~15 使用从 PIC (端口 0xA1)
+ *   - 使用 irq & 7 将中断号映射到 PIC 内部的 0~7 位
+ */
+
+
 void pic_mask(ku8 irq)
 {
-
+    ku16 port = (irq < 8) ? PIC1_DATA : PIC2_DATA;
+    asm_outb(port, asm_inb(port) | (1 << (irq & 7)));
 }
 
 void pic_unmask(ku8 irq)
 {
-    
+    ku16 port = (irq < 8) ? PIC1_DATA : PIC2_DATA;
+    asm_outb(port, asm_inb(port) & ~(1 << (irq & 7)));
 }

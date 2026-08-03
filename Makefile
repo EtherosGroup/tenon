@@ -8,7 +8,7 @@ CFLAGS    := -m64 -mno-red-zone -ffreestanding -nostdlib -nostartfiles -nodefaul
 LDFLAGS   := -T kernel/linker.ld -nostdlib
 
 SRC_C   := $(shell find kernel -name '*.c')
-SRC_ASM := kernel/boot/boot.S
+SRC_ASM := $(shell find kernel -name '*.S')
 
 OBJ_C   := $(patsubst %.c,$(BUILD)/%.o,$(SRC_C))
 OBJ_ASM := $(patsubst %.S,$(BUILD)/%.o,$(SRC_ASM))
