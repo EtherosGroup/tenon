@@ -1,6 +1,10 @@
 #ifndef KERNEL_TYPES_H
 #define KERNEL_TYPES_H
 
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+
 typedef unsigned char ku8;
 typedef unsigned short ku16;
 typedef unsigned int ku32;
