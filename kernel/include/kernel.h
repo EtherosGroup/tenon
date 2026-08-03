@@ -3,5 +3,6 @@
 
 #include "asm.h"
 #include "serial.h"
+#include "idt.h"
 
 #endif
