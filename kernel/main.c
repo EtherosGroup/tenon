@@ -6,4 +6,5 @@ void start_kernel()
     kprintln("aaaaaa");
 
     idt_init();
+    pic_init();
 }

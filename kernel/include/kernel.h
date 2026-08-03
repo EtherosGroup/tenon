@@ -4,5 +4,6 @@
 #include "asm.h"
 #include "serial.h"
 #include "idt.h"
+#include "pic.h"
 
 #endif

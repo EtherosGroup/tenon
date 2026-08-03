@@ -6,6 +6,7 @@
 #define IDT_GATE_INTERRUPT 0x8E // 中断门
 #define IDT_GATE_TRAP 0x8F // 陷阱门
 #define KERNEL_CS 0x08 // 选择子
+#define IRQ_BASE 0x20 // IQR基址
 
 typedef struct 
 {
