@@ -1,16 +1,14 @@
 #ifndef KERNEL_SERIAL_H
 #define KERNEL_SERIAL_H
 
-/**
- * 向QEMU串口输出字符串
- * @param chars[] 字符串
- */
+#include "types.h"
+
 void kprint(char chars[]);
 
-/**
- * 向QEMU串口输出字符串，自动换行
- * @param chars[] 字符串
- */
 void kprintln(char chars[]);
+
+void kprint_hex(ku64 num);
+
+void kprint_dec(ku64 num);
 
 #endif

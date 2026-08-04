@@ -1,40 +1,37 @@
-CC      := gcc
-LD      := ld
+CC = gcc
+LD = ld
 
-BUILD   := build
+CFLAGS = -m64 -mno-red-zone -ffreestanding -nostdlib -nostartfiles \
+         -nodefaultlibs -Wall -Wextra -Werror -O0 \
+         -I kernel/include \
+         -mcmodel=large
 
-CFLAGS    := -m64 -mno-red-zone -ffreestanding -nostdlib -nostartfiles -nodefaultlibs \
-             -Wall -Wextra -Werror -I kernel/include -mcmodel=large
-LDFLAGS   := -T kernel/linker.ld -nostdlib
+LDFLAGS = -T kernel/linker.ld -nostdlib
 
-SRC_C   := $(shell find kernel -name '*.c')
-SRC_ASM := $(shell find kernel -name '*.S')
+SRC_C = $(shell find kernel -name '*.c')
+SRC_S = $(shell find kernel -name '*.S')
+OBJ_C = $(patsubst kernel/%.c, build/kernel/%.o, $(SRC_C))
+OBJ_S = $(patsubst kernel/%.S, build/kernel/%.o, $(SRC_S))
+OBJ   = $(OBJ_C) $(OBJ_S)
 
-OBJ_C   := $(patsubst %.c,$(BUILD)/%.o,$(SRC_C))
-OBJ_ASM := $(patsubst %.S,$(BUILD)/%.o,$(SRC_ASM))
-OBJS    := $(OBJ_ASM) $(OBJ_C)
+.PHONY: all run clean
 
-TARGET  := $(BUILD)/kernel.elf
+all: build/kernel.elf
 
-.PHONY: all clean run
-
-all: $(TARGET)
-
-$(TARGET): $(OBJS)
-	@mkdir -p $(dir $(TARGET))
-	$(LD) $(LDFLAGS) -o $@ $^
-
-$(BUILD)/%.o: %.S
+build/kernel/%.o: kernel/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD)/%.o: %.c
+build/kernel/%.o: kernel/%.S
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/kernel.elf: $(OBJ)
+	$(LD) $(LDFLAGS) $(OBJ) -o $@
+
+run:
+	@echo "kernel built: build/kernel.elf"
+	@echo "Copy to Windows QEMU to run."
 
 clean:
-	rm -rf $(BUILD)
-
-run: $(TARGET)
-	@echo "构建完成: $(TARGET)"
-	@echo "请将 build/kernel.elf 复制到 Windows QEMU 中运行"
+	rm -rf build/

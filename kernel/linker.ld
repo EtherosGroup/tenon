@@ -14,6 +14,8 @@ SECTIONS
 {
     . = KERNEL_PHYS;
 
+    __kernel_phys_start = .;
+
     .multiboot : {
         *(.multiboot)
     } :text
@@ -37,6 +39,8 @@ SECTIONS
     .bss : {
         *(.bss*)
     } :bss
+
+    __kernel_phys_end = .;
 
     /DISCARD/ : {
         *(.comment*)
