@@ -45,14 +45,14 @@ static kbool grow_heap(ku64 min_size) {
 }
 
 void kheap_init(void) {
-    free_list = NULL;
-    heap_top  = KERNEL_HEAP_START;
-    heap_end  = KERNEL_HEAP_START + KERNEL_HEAP_SIZE;
+    free_list = null;
+    heap_top = KERNEL_HEAP_START;
+    heap_end = KERNEL_HEAP_START + KERNEL_HEAP_SIZE;
     kprintln("[KHEAP] Initialized.");
 }
 
 void *kmalloc(ku64 size) {
-    if (!size) return NULL;
+    if (!size) return null;
 
     ku64 total_size = align_up(size + sizeof(heap_block_t), KHEAP_MIN_ALLOC);
 
@@ -75,7 +75,7 @@ void *kmalloc(ku64 size) {
     }
 
     // 没有合适的空闲块, 扩展堆
-    if (!grow_heap(total_size)) return NULL;
+    if (!grow_heap(total_size)) return null;
     return kmalloc(size); // 重试
 }
 
@@ -91,7 +91,7 @@ void kfree(void *ptr) {
 
 void *krealloc(void *ptr, ku64 new_size) {
     if (!ptr) return kmalloc(new_size);
-    if (!new_size) { kfree(ptr); return NULL; }
+    if (!new_size) { kfree(ptr); return null; }
 
     heap_block_t *block = (heap_block_t *)((ku8 *)ptr - sizeof(heap_block_t));
     ku64 old_payload = block->size - sizeof(heap_block_t);
@@ -99,7 +99,7 @@ void *krealloc(void *ptr, ku64 new_size) {
     if (old_payload >= new_size) return ptr;
 
     void *new_ptr = kmalloc(new_size);
-    if (!new_ptr) return NULL;
+    if (!new_ptr) return null;
 
     for (ku64 i = 0; i < old_payload; i++) {
         ((ku8 *)new_ptr)[i] = ((ku8 *)ptr)[i];

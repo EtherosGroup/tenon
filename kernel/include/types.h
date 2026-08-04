@@ -1,8 +1,8 @@
 #ifndef KERNEL_TYPES_H
 #define KERNEL_TYPES_H
 
-#ifndef NULL
-#define NULL ((void*)0)
+#ifndef null
+#define null ((void*)0)
 #endif
 
 typedef enum { false = 0, true = 1 } kbool;

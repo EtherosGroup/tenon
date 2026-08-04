@@ -67,11 +67,11 @@ static void mm_verify(void) {
 
     /* --- KHEAP: alloc/free/realloc --- */
     void *a = kmalloc(0);
-    if (a != NULL) { kprintln("[FAIL] kmalloc(0) should return NULL"); return; }
-    kprintln("[PASS] kmalloc(0) -> NULL");
+    if (a != null) { kprintln("[FAIL] kmalloc(0) should return null"); return; }
+    kprintln("[PASS] kmalloc(0) -> null");
 
     ku8 *b = (ku8 *)kmalloc(128);
-    if (!b) { kprintln("[FAIL] kmalloc(128) returned NULL"); return; }
+    if (!b) { kprintln("[FAIL] kmalloc(128) returned null"); return; }
     kprint("[PASS] kmalloc(128) -> "); kprint_hex((ku64)b); kprintln("");
 
     for (int i = 0; i < 128; i++) b[i] = (ku8)(i & 0xFF);
@@ -94,9 +94,9 @@ static void mm_verify(void) {
     if (!d) { kprintln("[FAIL] krealloc to larger size"); return; }
     kprintln("[PASS] krealloc(64->256)");
 
-    void *e = krealloc(NULL, 32);
-    if (!e) { kprintln("[FAIL] krealloc(NULL, 32)"); return; }
-    kprintln("[PASS] krealloc(NULL, 32) -> alloc");
+    void *e = krealloc(null, 32);
+    if (!e) { kprintln("[FAIL] krealloc(null, 32)"); return; }
+    kprintln("[PASS] krealloc(null, 32) -> alloc");
 
     kfree(d);
     kfree(e);

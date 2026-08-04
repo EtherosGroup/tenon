@@ -18,7 +18,7 @@ void task_init(void)
 
     idle->id = 0;
     idle->state = TASK_RUNNING;
-    idle->kernel_stack = NULL;
+    idle->kernel_stack = null;
     idle->name = "idle";
     idle->next = idle;
 
@@ -34,14 +34,14 @@ task_type *task_create(void (*entry)(void), const char *name)
     task_type *task = (task_type *)kmalloc(sizeof(task_type));
     if (!task) {
         kprintln("[TASK] Failed to allocate task struct");
-        return NULL;
+        return null;
     }
 
     ku8 *stack = (ku8 *)kmalloc(PAGE_SIZE);
     if (!stack) {
         kprintln("[TASK] Failed to allocate kernel stack");
         kfree(task);
-        return NULL;
+        return null;
     }
 
     ku64 stack_top = (ku64)stack + PAGE_SIZE;
