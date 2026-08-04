@@ -3,6 +3,7 @@
 #include "serial.h"
 #include "asm.h"
 #include "keyboard.h"
+#include "pit.h"
 
 static void hex_print(ku8 byte) {
     static const char hex[] = "0123456789ABCDEF";
@@ -34,6 +35,11 @@ void isr_handler(int_frame_type *frame)
     else if (frame->vector >= IRQ_BASE)
     {
         ku8 irq = frame->vector - IRQ_BASE;
+        if (irq == 0)
+        // PIT
+        {
+            pit_tick_handler();
+        }
         if (irq == 1)
         // 键盘
         {

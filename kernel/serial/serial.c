@@ -3,7 +3,7 @@
 
 #define COM1 0x3F8
 
-static int is_transmit_empty(void)
+static kbool is_transmit_empty(void)
 {
     return asm_inb(COM1 + 5) & 0x20;
 }

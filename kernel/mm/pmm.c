@@ -37,9 +37,9 @@ static void bitmap_clear(ku64 page) {
 }
 
 /**
- * 查询第 page 号页框是否已用，返回 0（空闲）或 1（已用）
+ * 查询第 page 号页框是否已用，返回 false（空闲）或 true（已用）
  */
-static int bitmap_test(ku64 page) {
+static kbool bitmap_test(ku64 page) {
     return (bitmap[page / 8] >> (page % 8)) & 1;
 }
 

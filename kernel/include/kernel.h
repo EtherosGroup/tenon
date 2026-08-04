@@ -11,5 +11,6 @@
 #include "pmm.h"
 #include "vmm.h"
 #include "kheap.h"
+#include "pit.h"
 
 #endif

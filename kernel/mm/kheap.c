@@ -17,20 +17,20 @@ static ku64 align_up(ku64 size, ku64 align) {
     return (size + align - 1) & ~(align - 1);
 }
 
-static int grow_heap(ku64 min_size) {
+static kbool grow_heap(ku64 min_size) {
     ku64 needed = align_up(min_size, PAGE_SIZE);
     ku64 pages = needed / PAGE_SIZE;
 
     if (heap_top + needed > heap_end) {
         kprintln("[KHEAP] Out of virtual address space.");
-        return 0;
+        return false;
     }
 
     for (ku64 i = 0; i < pages; i++) {
         ku64 phys = pmm_alloc_page();
         if (!phys) {
             kprintln("[KHEAP] Out of physical memory.");
-            return 0;
+            return true;
         }
         vmm_map_page(&kernel_as, heap_top + i * PAGE_SIZE, phys, PTE_PRESENT | PTE_WRITABLE | PTE_NX);
     }
@@ -41,7 +41,7 @@ static int grow_heap(ku64 min_size) {
     free_list = block;
 
     heap_top += pages * PAGE_SIZE;
-    return 1;
+    return true;
 }
 
 void kheap_init(void) {

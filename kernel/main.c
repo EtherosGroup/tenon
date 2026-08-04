@@ -90,6 +90,10 @@ static void mm_verify(void) {
     kfree(e);
     kprintln("[PASS] cleanup done");
 
+    kprintln("[PIT] pit 2000ms sleep test");
+    sleep_ms(2000);
+    kprintln("[PASS] pit test passed");
+
     kprintln("===== ALL TESTS PASSED =====");
 }
 
@@ -98,15 +102,19 @@ void start_kernel(ku32 magic, ku64 info_ptr)
     kprint("\n");
     kprintln("Tenon v0.0.1");
 
+    // mm
     pmm_init(magic, info_ptr);
-
     vmm_init();
-
     kheap_init();
+    
+    // pit
+    pit_init(1000);
+
 
     idt_init();
     pic_init();
-    pic_unmask(1);
+    pic_unmask(0); // 开PIT
+    pic_unmask(1); // 开键盘
     asm_sti();
 
     mm_verify();
