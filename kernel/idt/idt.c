@@ -69,12 +69,13 @@ static void default_exception_handler(void)
     asm_halt();
 }
 
-void idt_set_gate(u8 vector, void (*isr)(void), u8 type, u8 dpl)
+void idt_set_gate(u8 vector, void (*isr)(void), u8 type, u8 dpl, u8 ist)
 {
     u64 addr = (u64)isr;
 
     idt[vector].low  = (addr & 0xFFFF)
                      | ((u64)KERNEL_CS << 16)
+                     | ((u64)(ist & 7) << 32)
                      | ((u64)(type & 0xF) << 40)
                      | ((u64)(dpl & 3) << 45)
                      | (1ULL << 47)
@@ -85,13 +86,19 @@ void idt_set_gate(u8 vector, void (*isr)(void), u8 type, u8 dpl)
 
 void idt_init(void)
 {
-    // 对于0-47指向对应的isr
     for (u16 i = 0; i < 48; i++)
-        idt_set_gate((u8)i, isr_table[i], IDT_GATE_INTERRUPT, 0);
+    {
+        idt_set_gate((u8)i, isr_table[i], IDT_GATE_INTERRUPT, 0, 0);
+    }
 
-    // 向量48-255仍然指向默认处理器
     for (u16 i = 48; i < 256; i++)
-        idt_set_gate((u8)i, default_exception_handler, IDT_GATE_INTERRUPT, 0);
+    {
+        idt_set_gate((u8)i, default_exception_handler, IDT_GATE_INTERRUPT, 0, 0);
+    }
+
+    idt_set_gate(2,  isr_table[2],  IDT_GATE_INTERRUPT, 0, 1);   // NMI → IST1
+    idt_set_gate(8,  isr_table[8],  IDT_GATE_INTERRUPT, 0, 2);   // Double Fault → IST2
+    idt_set_gate(18, isr_table[18], IDT_GATE_INTERRUPT, 0, 3);   // Machine Check → IST3
 
     asm_lidt(idt, sizeof(idt));
 }

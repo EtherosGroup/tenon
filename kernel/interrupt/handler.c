@@ -14,7 +14,6 @@ static void hex_print(u8 byte) {
     buf[1] = hex[byte & 0xF];
     buf[2] = '\0';
     kprint(buf);
-
 }
 
 static void exception_handler(int_frame_type *frame)
@@ -22,7 +21,6 @@ static void exception_handler(int_frame_type *frame)
     kprint("Exception #");
     hex_print((u8)frame->vector);
     kprint(" err=");
-    // 需实现 hex64 打印 error_code... 先简化为只打 vector
     kprintln("");
     asm_halt();
 }
@@ -40,6 +38,17 @@ void isr_handler(int_frame_type *frame)
         {
             pic_eoi(0);
             pit_tick_handler();
+
+            task_type *t = ready_queue;
+            do {
+                if (t->state == TASK_BLOCKED && t->sleep_until != 0
+                    && tick_count >= t->sleep_until) {
+                    t->state = TASK_READY;
+                    t->sleep_until = 0;
+                }
+                t = t->next;
+            } while (t != ready_queue);
+
             if (tick_count % 10 == 0)
             {
                 schedule();

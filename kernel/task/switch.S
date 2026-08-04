@@ -29,5 +29,6 @@ task_switch:
 task_start:
     sti
     pop %rdi
+    pop %rsi
     call *%rdi
     call task_exit

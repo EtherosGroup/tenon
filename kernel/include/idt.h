@@ -14,7 +14,7 @@ typedef struct
     u64 high;
 } __attribute__((packed)) idt_gate_type;
 
-void idt_set_gate(u8 vector, void (*isr)(void), u8 type, u8 dpl);
+void idt_set_gate(u8 vector, void (*isr)(void), u8 type, u8 dpl, u8 ist);
 void idt_init(void);
 
 typedef struct {

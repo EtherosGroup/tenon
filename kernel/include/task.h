@@ -27,15 +27,20 @@ typedef struct task_struct {
     void *kernel_stack;
     const char *name;
     struct task_struct *next;
+    u64 sleep_until;
 } task_type;
 
 extern task_type *current_task;
 extern task_type *ready_queue;
 
 void task_init(void);
-task_type *task_create(void (*entry)(void), const char *name);
+task_type *task_create(void (*entry)(void *arg), void *arg, const char *name);
 void task_exit(void);
 void task_yield(void);
+void task_block(void);
+void task_wakeup(task_type *task);
+void task_sleep_ms(u32 ms);
+void reap_dead_tasks(void);
 void schedule(void);
 
 extern void task_switch(task_context_type *old, task_context_type *new);

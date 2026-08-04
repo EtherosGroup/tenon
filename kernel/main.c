@@ -1,15 +1,31 @@
 #include "kernel.h"
 
-static void task_a(void) {
+static task_type *task_b_ptr;
+
+static void task_a(void *arg) {
+    (void)arg;
     for (;;) {
         kprint("A");
+        task_sleep_ms(3000);
+        kprint("[wake B]");
+        task_wakeup(task_b_ptr);
     }
 }
 
-static void task_b(void) {
+static void task_b(void *arg) {
+    (void)arg;
+    task_b_ptr = current_task;
     for (;;) {
+        task_block();
         kprint("B");
     }
+}
+
+static void task_c(void *arg) {
+    (void)arg;
+    for (int i = 0; i < 100; i++)
+        kprint("C");
+    task_exit();
 }
 
 static void mm_verify(void) {
@@ -123,10 +139,12 @@ void start_kernel(u32 magic, u64 info_ptr)
     pit_init(1000);
 
     idt_init();
+    tss_init();
     task_init();
 
-    task_create(task_a, "a");
-    task_create(task_b, "b");
+    task_create(task_a, null, "a");
+    task_create(task_b, null, "b");
+    task_create(task_c, null, "c");
 
     pic_init();
     pic_unmask(0); // 开PIT

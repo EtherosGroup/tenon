@@ -1,12 +1,24 @@
 #include "task.h"
 #include "serial.h"
+#include "asm.h"
 
 void schedule(void)
 {
+    asm_cli();
+
     task_type *prev = current_task;
 
-    task_type *start = prev->next;
-    task_type *next = start;
+    task_type *next;
+    if (prev->state == TASK_DEAD)
+    {
+        next = ready_queue;
+    }
+    else
+    {
+        next = prev->next;
+    }
+
+    task_type *start = next;
     do {
         if (next->state == TASK_READY)
         {
@@ -15,8 +27,9 @@ void schedule(void)
         next = next->next;
     } while (next != start);
 
-    if (next->state != TASK_READY)
-    {
+    if (next->state != TASK_READY) {
+        reap_dead_tasks();
+        asm_sti();
         return;
     }
 
@@ -29,4 +42,6 @@ void schedule(void)
     current_task = next;
 
     task_switch(&prev->context, &next->context);
+
+    asm_sti();
 }
