@@ -9,10 +9,11 @@
  */
 static ku64 total_pages; // 总页数
 static ku64 free_count; // 总空闲页数
-static ku8 *bitmap; // 
-static ku64 bitmap_phys; // 
-static ku64 bitmap_pages; //
+static ku8 *bitmap; // 位图指针，指向物理地址 bitmap_phys，每个 bit 代表一个页框
+static ku64 bitmap_phys; // 位图占用区域的物理起始地址
+static ku64 bitmap_pages; // 位图占用的 4 KiB 页数
 
+// L1 分配缓存：存放最近释放的页号，分配时栈顶弹出 O(1) 命中
 #define FREE_STACK_SIZE 512
 static ku64 free_stack[FREE_STACK_SIZE];
 static ku32 stack_top;
@@ -21,31 +22,41 @@ static memory_region_type memory_regions[MAX_MEMORY_REGIONS];
 static ku32 memory_region_count;
 
 /**
- * bitmap utils
+ * 将第 page 号页框标记为已用（bit 置 1）
+ * page / 8 定位到字节，page % 8 定位到 bit
  */
-
 static void bitmap_set(ku64 page) {
     bitmap[page / 8] |= (ku8)(1 << (page % 8));
 }
 
+/**
+ * 将第 page 号页框标记为空闲（bit 清 0）
+ */
 static void bitmap_clear(ku64 page) {
     bitmap[page / 8] &= (ku8)~(1 << (page % 8));
 }
 
+/**
+ * 查询第 page 号页框是否已用，返回 0（空闲）或 1（已用）
+ */
 static int bitmap_test(ku64 page) {
     return (bitmap[page / 8] >> (page % 8)) & 1;
 }
 
 /**
- * Free Stack utils
+ * 将页号推入释放缓存栈
+ * 栈满时静默丢弃，被丢弃的页下次分配时通过位图线性扫描找回
  */
-
 static void stack_push(ku64 page) {
     if (stack_top < FREE_STACK_SIZE) {
         free_stack[stack_top++] = page;
     }
 }
 
+/**
+ * 从释放缓存栈弹出一个页号
+ * 栈空时返回 (ku64)-1，调用方自行判断并 fallback 到位图扫描
+ */
 static ku64 stack_pop(void) {
     if (stack_top > 0) {
         return free_stack[--stack_top];
@@ -54,9 +65,10 @@ static ku64 stack_pop(void) {
 }
 
 /**
- * func
+ * 将 [base, base+length) 物理地址范围标记为"已用" （左闭右开666死去的数学开始攻击我）
+ * 对齐策略：PAGE_ALIGN_DOWN(base) 到 PAGE_ALIGN_UP(base+length)，
+ * 确保区域两端的不完整页也被覆盖
  */
-
 static void bitmap_mark_region_used(ku64 base, ku64 length) {
     ku64 start = ADDR_TO_PAGE(PAGE_ALIGN_DOWN(base));
     ku64 end = ADDR_TO_PAGE(PAGE_ALIGN_UP(base + length));
@@ -68,6 +80,9 @@ static void bitmap_mark_region_used(ku64 base, ku64 length) {
     }
 }
 
+/*
+ * 将 [base, base+length) 物理地址范围标记为"空闲"
+ */
 static void bitmap_mark_region_free(ku64 base, ku64 length) {
     ku64 start = ADDR_TO_PAGE(PAGE_ALIGN_DOWN(base));
     ku64 end = ADDR_TO_PAGE(PAGE_ALIGN_UP(base + length));

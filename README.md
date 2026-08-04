@@ -10,7 +10,13 @@ Tenon的目标不是成为流行的操作系统，只是一群高中生闲的没
 总之，好奇心不一定会害死猫，但一定能让我们在深夜盯着QEMU模拟器里那一闪而过的“Hello World”傻笑十分钟。Tenon或许永远跑不到生产环境，也干不过Linux，但它就像我们亲手焊出来的一块电路板，粗糙、简陋，甚至带着焊锡疙瘩。我们享受的，是看着那一行行C代码最终变成CPU上跳动的电信号的过程——这就是计算机最本来的浪漫。
 
 ## 构建与运行（待补充）
-施工中，欢迎PR补充构建文档。
+#### 构建
+请确保在Linux环境下编译源代码以避免出现一些奇奇怪怪的问题
+> 本人是在Windows的WSL中编写和编译的源代码，将生成的产物（比如kernel.elf什么的）复制到Windows中再用QEMU运行，这样就解决了Linux下切换QEMU键盘输入太繁琐的问题（
+#### 运行
+当前阶段运行，只需要使用QEMU以```-kernel```参数运行elf文件即可
+
+e.g. ```D:\Apps\qemu\qemu-system-x86_64.exe -kernel kernel.elf -serial stdio```
 
 ## LICNECE
 Tenon 使用 Apache License 2.0 开源。
@@ -18,5 +24,5 @@ Tenon 使用 Apache License 2.0 开源。
 你可以自由地使用、修改、分发本项目的代码，但需保留版权声明，并明确声明对修改部分的免责。详细条款请参见项目根目录下的[LICENSE](LICENSE) 文件。
 
 ## 联系
-QQ群：870666822
-官网（搭建中）：etheros.skilfully.cn
+- QQ群：870666822
+- 官网（搭建中）：etheros.skilfully.cn
