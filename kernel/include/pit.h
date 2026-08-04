@@ -18,4 +18,6 @@ void pit_tick_handler(void);
  */
 void sleep_ms(ku32 ms);
 
+extern volatile ku64 tick_count;
+
 #endif

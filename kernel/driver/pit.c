@@ -2,7 +2,7 @@
 #include "asm.h"
 
 // 系统启动以来的总 tick 数
-static volatile ku64 tick_count = 0;
+volatile ku64 tick_count = 0;
 static volatile ku64 ticks;
 
 void pit_init(ku32 freq_hz)

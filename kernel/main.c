@@ -1,5 +1,17 @@
 #include "kernel.h"
 
+static void task_a(void) {
+    for (;;) {
+        kprint("A");
+    }
+}
+
+static void task_b(void) {
+    for (;;) {
+        kprint("B");
+    }
+}
+
 static void mm_verify(void) {
     kprintln("===== MM Verification =====");
 
@@ -31,7 +43,7 @@ static void mm_verify(void) {
     /* --- VMM: map / unmap / get_mapping --- */
     ku64 pa = pmm_alloc_page();
     if (!pa) { kprintln("[FAIL] pmm_alloc for vmm test"); return; }
-    ku64 va = KERNEL_HEAP_START + 0x100000; /* 用堆上方未使用的 VA */
+    ku64 va = KERNEL_HEAP_START + 0x100000;
     ku64 flags = PTE_PRESENT | PTE_WRITABLE;
 
     vmm_map_page(&kernel_as, va, pa, flags);
@@ -110,8 +122,12 @@ void start_kernel(ku32 magic, ku64 info_ptr)
     // pit
     pit_init(1000);
 
-
     idt_init();
+    task_init();
+
+    task_create(task_a, "a");
+    task_create(task_b, "b");
+
     pic_init();
     pic_unmask(0); // 开PIT
     pic_unmask(1); // 开键盘

@@ -6,6 +6,7 @@
 #include "serial.h"
 #include "idt.h"
 #include "pic.h"
+#include "task.h"
 #include "memlayout.h"
 #include "multiboot.h"
 #include "pmm.h"

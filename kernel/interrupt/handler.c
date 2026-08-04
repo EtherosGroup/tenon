@@ -4,6 +4,7 @@
 #include "asm.h"
 #include "keyboard.h"
 #include "pit.h"
+#include "task.h"
 
 static void hex_print(ku8 byte) {
     static const char hex[] = "0123456789ABCDEF";
@@ -36,15 +37,22 @@ void isr_handler(int_frame_type *frame)
     {
         ku8 irq = frame->vector - IRQ_BASE;
         if (irq == 0)
-        // PIT
         {
+            pic_eoi(0);
             pit_tick_handler();
+            if (tick_count % 10 == 0)
+            {
+                schedule();
+            }
         }
-        if (irq == 1)
-        // 键盘
+        else if (irq == 1)
         {
+            pic_eoi(1);
             keyboard_handler();
         }
-        pic_eoi(irq);
+        else
+        {
+            pic_eoi(irq);
+        }
     }
 }
