@@ -3,14 +3,16 @@
 
 #include "types.h"
 
-typedef enum {
+typedef enum
+{
     TASK_RUNNING,
     TASK_READY,
     TASK_BLOCKED,
     TASK_DEAD
 } task_state_type;
 
-typedef struct {
+typedef struct
+{
     u64 r15;
     u64 r14;
     u64 r13;
@@ -20,7 +22,8 @@ typedef struct {
     u64 rsp;
 } task_context_type;
 
-typedef struct task_struct {
+typedef struct task_struct
+{
     u32 id;
     task_state_type state;
     task_context_type context;

@@ -32,31 +32,41 @@ static void kputc(char c)
 void kprint_hex(u64 num)
 {
     kprint("0x");
-    if (num == 0) {
+    if (num == 0)
+    {
         kputc('0');
         return;
     }
     char buf[16];
     int i = 0;
-    while (num) {
+    while (num)
+    {
         u8 d = num & 0xF;
         buf[i++] = d < 10 ? '0' + d : 'A' + d - 10;
         num >>= 4;
     }
-    while (i--) kputc(buf[i]);
+    while (i--)
+    {
+        kputc(buf[i]);
+    }
 }
 
 void kprint_dec(u64 num)
 {
-    if (num == 0) {
+    if (num == 0)
+    {
         kputc('0');
         return;
     }
     char buf[20];
     int i = 0;
-    while (num) {
+    while (num)
+    {
         buf[i++] = '0' + (num % 10);
         num /= 10;
     }
-    while (i--) kputc(buf[i]);
+    while (i--)
+    {
+        kputc(buf[i]);
+    }
 }

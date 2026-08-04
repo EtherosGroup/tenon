@@ -8,7 +8,7 @@
 #define KERNEL_CS 0x08 // 选择子
 #define IRQ_BASE 0x20 // IQR基址
 
-typedef struct 
+typedef struct
 {
     u64 low;
     u64 high;
@@ -17,7 +17,8 @@ typedef struct
 void idt_set_gate(u8 vector, void (*isr)(void), u8 type, u8 dpl, u8 ist);
 void idt_init(void);
 
-typedef struct {
+typedef struct
+{
     u64 rax, rbx, rcx, rdx, rsi, rdi, rbp, r8, r9, r10, r11, r12, r13, r14, r15;
     u64 vector;
     u64 error_code;

@@ -13,7 +13,8 @@ static task_type *dead_list = null;
 void task_init(void)
 {
     task_type *idle = (task_type *)kmalloc(sizeof(task_type));
-    if (!idle) {
+    if (!idle)
+    {
         kprintln("[TASK] Failed to allocate idle task");
         asm_halt();
     }
@@ -36,13 +37,15 @@ void task_init(void)
 task_type *task_create(void (*entry)(void *arg), void *arg, const char *name)
 {
     task_type *task = (task_type *)kmalloc(sizeof(task_type));
-    if (!task) {
+    if (!task)
+    {
         kprintln("[TASK] Failed to allocate task struct");
         return null;
     }
 
     u8 *stack = (u8 *)kmalloc(PAGE_SIZE);
-    if (!stack) {
+    if (!stack)
+    {
         kprintln("[TASK] Failed to allocate kernel stack");
         kfree(task);
         return null;
@@ -90,7 +93,10 @@ void task_exit(void)
 
     schedule();
 
-    for (;;) asm_hlt();
+    for (;;)
+    {
+        asm_hlt();
+    }
 }
 
 void task_yield(void)
@@ -107,7 +113,8 @@ void task_block(void)
 
 void task_wakeup(task_type *task)
 {
-    if (task->state == TASK_BLOCKED) {
+    if (task->state == TASK_BLOCKED)
+    {
         task->state = TASK_READY;
         task->sleep_until = 0;
     }
@@ -121,7 +128,8 @@ void task_sleep_ms(u32 ms)
 
 void reap_dead_tasks(void)
 {
-    while (dead_list) {
+    while (dead_list)
+    {
         task_type *dead = dead_list;
         dead_list = dead->next;
         kfree(dead->kernel_stack);

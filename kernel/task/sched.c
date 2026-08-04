@@ -19,15 +19,18 @@ void schedule(void)
     }
 
     task_type *start = next;
-    do {
+    do
+    {
         if (next->state == TASK_READY)
         {
             break;
         }
         next = next->next;
-    } while (next != start);
+    }
+    while (next != start);
 
-    if (next->state != TASK_READY) {
+    if (next->state != TASK_READY)
+    {
         reap_dead_tasks();
         asm_sti();
         return;

@@ -27,7 +27,7 @@ void pic_init(void)
 void pic_eoi(u8 irq)
 {
     if (irq >= 8)
-    // irq >= 8 说明是从片发的，此时先发从片后再发主片
+        // irq >= 8 说明是从片发的，此时先发从片后再发主片
     {
         asm_outb(PIC2, PIC_EOI);
     }

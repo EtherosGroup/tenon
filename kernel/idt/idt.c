@@ -54,7 +54,8 @@ extern void isr45(void);
 extern void isr46(void);
 extern void isr47(void);
 
-static void (*isr_table[48])(void) = {
+static void (*isr_table[48])(void) =
+{
     isr0,  isr1,  isr2,  isr3,  isr4,  isr5,  isr6,  isr7,
     isr8,  isr9,  isr10, isr11, isr12, isr13, isr14, isr15,
     isr16, isr17, isr18, isr19, isr20, isr21, isr22, isr23,
@@ -74,12 +75,12 @@ void idt_set_gate(u8 vector, void (*isr)(void), u8 type, u8 dpl, u8 ist)
     u64 addr = (u64)isr;
 
     idt[vector].low  = (addr & 0xFFFF)
-                     | ((u64)KERNEL_CS << 16)
-                     | ((u64)(ist & 7) << 32)
-                     | ((u64)(type & 0xF) << 40)
-                     | ((u64)(dpl & 3) << 45)
-                     | (1ULL << 47)
-                     | ((addr >> 16) & 0xFFFF) << 48;
+                       | ((u64)KERNEL_CS << 16)
+                       | ((u64)(ist & 7) << 32)
+                       | ((u64)(type & 0xF) << 40)
+                       | ((u64)(dpl & 3) << 45)
+                       | (1ULL << 47)
+                       | ((addr >> 16) & 0xFFFF) << 48;
 
     idt[vector].high = addr >> 32;
 }

@@ -11,17 +11,19 @@ void pit_init(u32 freq_hz)
     u32 divisor = 1193182 / freq_hz;
     // 命令：通道0、模式3(方波)、先低后高
     asm_outb(0x43, 0x36);
-    // 低 8 位     
+    // 低 8 位
     asm_outb(0x40, divisor & 0xFF);
-    // 高 8 位 
+    // 高 8 位
     asm_outb(0x40, (divisor >> 8) & 0xFF);
 }
 
-void pit_tick_handler(void) {
+void pit_tick_handler(void)
+{
     tick_count++;
 }
 
-void sleep_ms(u32 ms) {
+void sleep_ms(u32 ms)
+{
     u64 target = tick_count + ms; // tick_count 每 ms 加 1 (1000Hz 时)
     while (tick_count < target)
     {

@@ -108,8 +108,8 @@ void asm_cpuid(u32 leaf, u32 subleaf,
                u32 *ecx, u32 *edx)
 {
     __asm__ volatile("cpuid"
-        : "=a"(*eax), "=b"(*ebx), "=c"(*ecx), "=d"(*edx)
-        : "a"(leaf), "c"(subleaf));
+                     : "=a"(*eax), "=b"(*ebx), "=c"(*ecx), "=d"(*edx)
+                     : "a"(leaf), "c"(subleaf));
 }
 
 void asm_hlt(void)
@@ -121,7 +121,9 @@ void asm_halt(void)
 {
     asm_cli();
     for (;;)
+    {
         asm_hlt();
+    }
 }
 
 void asm_cli(void)
@@ -198,15 +200,16 @@ u64 asm_rdtscp(u32 *aux)
 u32 asm_xchg(volatile u32 *ptr, u32 value)
 {
     __asm__ volatile("xchgl %0, %1"
-        : "+r"(value), "+m"(*ptr)
-        :
-        : "memory");
+                     : "+r"(value), "+m"(*ptr)
+                     :
+                     : "memory");
     return value;
 }
 
 void asm_lgdt(void *ptr, u16 size)
 {
-    struct {
+    struct
+    {
         u16 limit;
         unsigned long base;
     } __attribute__((packed)) gdtr;
@@ -219,7 +222,8 @@ void asm_lgdt(void *ptr, u16 size)
 
 void asm_lidt(void *ptr, u16 size)
 {
-    struct {
+    struct
+    {
         u16 limit;
         unsigned long base;
     } __attribute__((packed)) idtr;
@@ -282,53 +286,137 @@ u16 asm_read_ss(void)
  * ======================================================================== */
 #elif defined(__arm__) || defined(__aarch64__)
 
-u8 asm_inb(u16 port) { (void)port; return 0; }
-void asm_outb(u16 port, u8 value) { (void)port; (void)value; }
-u16 asm_inw(u16 port) { (void)port; return 0; }
-void asm_outw(u16 port, u16 value) { (void)port; (void)value; }
-u32 asm_inl(u16 port) { (void)port; return 0; }
-void asm_outl(u16 port, u32 value) { (void)port; (void)value; }
+u8 asm_inb(u16 port)
+{
+    (void)port;
+    return 0;
+}
+void asm_outb(u16 port, u8 value)
+{
+    (void)port;
+    (void)value;
+}
+u16 asm_inw(u16 port)
+{
+    (void)port;
+    return 0;
+}
+void asm_outw(u16 port, u16 value)
+{
+    (void)port;
+    (void)value;
+}
+u32 asm_inl(u16 port)
+{
+    (void)port;
+    return 0;
+}
+void asm_outl(u16 port, u32 value)
+{
+    (void)port;
+    (void)value;
+}
 void asm_io_wait(void) {}
 
-u64 asm_rdmsr(u32 msr) { (void)msr; return 0; }
-void asm_wrmsr(u32 msr, u64 value) { (void)msr; (void)value; }
+u64 asm_rdmsr(u32 msr)
+{
+    (void)msr;
+    return 0;
+}
+void asm_wrmsr(u32 msr, u64 value)
+{
+    (void)msr;
+    (void)value;
+}
 
-unsigned long asm_read_cr0(void) { return 0; }
-unsigned long asm_read_cr2(void) { return 0; }
-unsigned long asm_read_cr3(void) { return 0; }
-unsigned long asm_read_cr4(void) { return 0; }
-void asm_write_cr0(unsigned long value) { (void)value; }
-void asm_write_cr3(unsigned long value) { (void)value; }
-void asm_write_cr4(unsigned long value) { (void)value; }
+unsigned long asm_read_cr0(void)
+{
+    return 0;
+}
+unsigned long asm_read_cr2(void)
+{
+    return 0;
+}
+unsigned long asm_read_cr3(void)
+{
+    return 0;
+}
+unsigned long asm_read_cr4(void)
+{
+    return 0;
+}
+void asm_write_cr0(unsigned long value)
+{
+    (void)value;
+}
+void asm_write_cr3(unsigned long value)
+{
+    (void)value;
+}
+void asm_write_cr4(unsigned long value)
+{
+    (void)value;
+}
 
 void asm_cpuid(u32 leaf, u32 subleaf,
                u32 *eax, u32 *ebx,
                u32 *ecx, u32 *edx)
 {
-    (void)leaf; (void)subleaf;
-    if (eax) *eax = 0;
-    if (ebx) *ebx = 0;
-    if (ecx) *ecx = 0;
-    if (edx) *edx = 0;
+    (void)leaf;
+    (void)subleaf;
+    if (eax)
+    {
+        *eax = 0;
+    }
+    if (ebx)
+    {
+        *ebx = 0;
+    }
+    if (ecx)
+    {
+        *ecx = 0;
+    }
+    if (edx)
+    {
+        *edx = 0;
+    }
 }
 
 void asm_hlt(void) {}
-void asm_halt(void) { for (;;) {} }
+void asm_halt(void)
+{
+    for (;;) {}
+}
 void asm_cli(void) {}
 void asm_sti(void) {}
 void asm_mfence(void) {}
 void asm_lfence(void) {}
 void asm_sfence(void) {}
 void asm_pause(void) {}
-void asm_invlpg(void *addr) { (void)addr; }
+void asm_invlpg(void *addr)
+{
+    (void)addr;
+}
 
-unsigned long asm_read_rflags(void) { return 0; }
-void asm_write_rflags(unsigned long flags) { (void)flags; }
+unsigned long asm_read_rflags(void)
+{
+    return 0;
+}
+void asm_write_rflags(unsigned long flags)
+{
+    (void)flags;
+}
 
-u64 asm_rdtsc(void) { return 0; }
+u64 asm_rdtsc(void)
+{
+    return 0;
+}
 u64 asm_rdtscp(u32 *aux)
 {
-    if (aux) *aux = 0;
+    if (aux)
+    {
+        *aux = 0;
+    }
     return 0;
 }
 
@@ -339,16 +427,45 @@ u32 asm_xchg(volatile u32 *ptr, u32 value)
     return old;
 }
 
-void asm_lgdt(void *ptr, u16 size) { (void)ptr; (void)size; }
-void asm_lidt(void *ptr, u16 size) { (void)ptr; (void)size; }
-void asm_ltr(u16 sel) { (void)sel; }
+void asm_lgdt(void *ptr, u16 size)
+{
+    (void)ptr;
+    (void)size;
+}
+void asm_lidt(void *ptr, u16 size)
+{
+    (void)ptr;
+    (void)size;
+}
+void asm_ltr(u16 sel)
+{
+    (void)sel;
+}
 
-u16 asm_read_cs(void) { return 0; }
-u16 asm_read_ds(void) { return 0; }
-u16 asm_read_es(void) { return 0; }
-u16 asm_read_fs(void) { return 0; }
-u16 asm_read_gs(void) { return 0; }
-u16 asm_read_ss(void) { return 0; }
+u16 asm_read_cs(void)
+{
+    return 0;
+}
+u16 asm_read_ds(void)
+{
+    return 0;
+}
+u16 asm_read_es(void)
+{
+    return 0;
+}
+u16 asm_read_fs(void)
+{
+    return 0;
+}
+u16 asm_read_gs(void)
+{
+    return 0;
+}
+u16 asm_read_ss(void)
+{
+    return 0;
+}
 
 #else
 #error "Unsupported architecture"

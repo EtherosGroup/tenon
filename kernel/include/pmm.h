@@ -10,7 +10,8 @@
  * @field base 区域起始物理地址
  * @field length 区域长度（字节），不一定页对齐
  */
-typedef struct {
+typedef struct
+{
     u64 base;
     u64 length;
 } memory_region_type;

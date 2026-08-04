@@ -2,9 +2,11 @@
 
 static task_type *task_b_ptr;
 
-static void task_a(void *arg) {
+static void task_a(void *arg)
+{
     (void)arg;
-    for (;;) {
+    for (;;)
+    {
         kprint("A");
         task_sleep_ms(3000);
         kprint("[wake B]");
@@ -12,69 +14,97 @@ static void task_a(void *arg) {
     }
 }
 
-static void task_b(void *arg) {
+static void task_b(void *arg)
+{
     (void)arg;
     task_b_ptr = current_task;
-    for (;;) {
+    for (;;)
+    {
         task_block();
         kprint("B");
     }
 }
 
-static void task_c(void *arg) {
+static void task_c(void *arg)
+{
     (void)arg;
     for (int i = 0; i < 100; i++)
+    {
         kprint("C");
+    }
     task_exit();
 }
 
-static void mm_verify(void) {
+static void mm_verify(void)
+{
     kprintln("===== MM Verification =====");
 
     /* --- PMM: alloc/free --- */
     u64 free_before = pmm_free_pages();
 
     u64 p1 = pmm_alloc_page();
-    if (!p1) { kprintln("[FAIL] pmm_alloc_page returned 0"); return; }
-    kprint("[PASS] pmm_alloc_page -> "); kprint_hex(p1); kprintln("");
+    if (!p1)
+    {
+        kprintln("[FAIL] pmm_alloc_page returned 0");
+        return;
+    }
+    kprint("[PASS] pmm_alloc_page -> ");
+    kprint_hex(p1);
+    kprintln("");
 
     u64 free_after_alloc = pmm_free_pages();
-    if (free_after_alloc != free_before - 1) {
+    if (free_after_alloc != free_before - 1)
+    {
         kprintln("[FAIL] free count mismatch after alloc");
         return;
     }
     kprintln("[PASS] free count --");
 
     pmm_free_page(p1);
-    if (pmm_free_pages() != free_before) {
+    if (pmm_free_pages() != free_before)
+    {
         kprintln("[FAIL] free count not restored after free");
         return;
     }
     kprintln("[PASS] pmm_free_page -> free count restored");
 
     u64 p2 = pmm_alloc_page();
-    if (!p2) { kprintln("[FAIL] re-alloc after free failed"); return; }
+    if (!p2)
+    {
+        kprintln("[FAIL] re-alloc after free failed");
+        return;
+    }
     kprintln("[PASS] re-alloc after free");
 
     /* --- VMM: map / unmap / get_mapping --- */
     u64 pa = pmm_alloc_page();
-    if (!pa) { kprintln("[FAIL] pmm_alloc for vmm test"); return; }
+    if (!pa)
+    {
+        kprintln("[FAIL] pmm_alloc for vmm test");
+        return;
+    }
     u64 va = KERNEL_HEAP_START + 0x100000;
     u64 flags = PTE_PRESENT | PTE_WRITABLE;
 
     vmm_map_page(&kernel_as, va, pa, flags);
 
     u64 got_pa = vmm_get_mapping(&kernel_as, va);
-    if (got_pa != pa) {
+    if (got_pa != pa)
+    {
         kprintln("[FAIL] vmm_get_mapping mismatch");
-        kprint("  expected: "); kprint_hex(pa); kprintln("");
-        kprint("  got:      "); kprint_hex(got_pa); kprintln("");
+        kprint("  expected: ");
+        kprint_hex(pa);
+        kprintln("");
+        kprint("  got:      ");
+        kprint_hex(got_pa);
+        kprintln("");
         return;
     }
     kprintln("[PASS] vmm_map_page + vmm_get_mapping");
 
     vmm_unmap_page(&kernel_as, va);
-    if (vmm_get_mapping(&kernel_as, va) != 0) {
+    if (vmm_get_mapping(&kernel_as, va) != 0)
+    {
         kprintln("[FAIL] vmm_unmap_page: mapping still present");
         return;
     }
@@ -83,16 +113,31 @@ static void mm_verify(void) {
 
     /* --- KHEAP: alloc/free/realloc --- */
     void *a = kmalloc(0);
-    if (a != null) { kprintln("[FAIL] kmalloc(0) should return null"); return; }
+    if (a != null)
+    {
+        kprintln("[FAIL] kmalloc(0) should return null");
+        return;
+    }
     kprintln("[PASS] kmalloc(0) -> null");
 
     u8 *b = (u8 *)kmalloc(128);
-    if (!b) { kprintln("[FAIL] kmalloc(128) returned null"); return; }
-    kprint("[PASS] kmalloc(128) -> "); kprint_hex((u64)b); kprintln("");
+    if (!b)
+    {
+        kprintln("[FAIL] kmalloc(128) returned null");
+        return;
+    }
+    kprint("[PASS] kmalloc(128) -> ");
+    kprint_hex((u64)b);
+    kprintln("");
 
-    for (int i = 0; i < 128; i++) b[i] = (u8)(i & 0xFF);
-    for (int i = 0; i < 128; i++) {
-        if (b[i] != (u8)(i & 0xFF)) {
+    for (int i = 0; i < 128; i++)
+    {
+        b[i] = (u8)(i & 0xFF);
+    }
+    for (int i = 0; i < 128; i++)
+    {
+        if (b[i] != (u8)(i & 0xFF))
+        {
             kprintln("[FAIL] kmalloc: data corruption");
             return;
         }
@@ -103,15 +148,27 @@ static void mm_verify(void) {
     kprintln("[PASS] kfree");
 
     void *c = kmalloc(64);
-    if (!c) { kprintln("[FAIL] kmalloc(64) after free"); return; }
+    if (!c)
+    {
+        kprintln("[FAIL] kmalloc(64) after free");
+        return;
+    }
     kprintln("[PASS] kmalloc(64) re-alloc after free");
 
     void *d = krealloc(c, 256);
-    if (!d) { kprintln("[FAIL] krealloc to larger size"); return; }
+    if (!d)
+    {
+        kprintln("[FAIL] krealloc to larger size");
+        return;
+    }
     kprintln("[PASS] krealloc(64->256)");
 
     void *e = krealloc(null, 32);
-    if (!e) { kprintln("[FAIL] krealloc(null, 32)"); return; }
+    if (!e)
+    {
+        kprintln("[FAIL] krealloc(null, 32)");
+        return;
+    }
     kprintln("[PASS] krealloc(null, 32) -> alloc");
 
     kfree(d);
@@ -134,7 +191,7 @@ void start_kernel(u32 magic, u64 info_ptr)
     pmm_init(magic, info_ptr);
     vmm_init();
     kheap_init();
-    
+
     // pit
     pit_init(1000);
 
@@ -153,7 +210,8 @@ void start_kernel(u32 magic, u64 info_ptr)
 
     mm_verify();
 
-    for (;;) {
+    for (;;)
+    {
         asm_hlt();
     }
 }

@@ -26,7 +26,7 @@ extern u8 __kernel_phys_end[];
  * 虚拟地址布局
  * 0x0000000000000000 ─ 0x00007FFFFFFFFFFF   用户空间，128 TiB
  * 0xFFFF800000000000 ─ 0xFFFFFFFFFFFFFFFF   内核空间，128 TiB
- * 
+ *
  * 内核区域
  * 0xFFFF900000000000   KERNEL_HEAP_START   内核堆
  * 0xFFFFA00000000000   KERNEL_DIRECT_BASE   物理内存直接映射窗口

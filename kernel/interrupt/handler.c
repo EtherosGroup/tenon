@@ -6,7 +6,8 @@
 #include "pit.h"
 #include "task.h"
 
-static void hex_print(u8 byte) {
+static void hex_print(u8 byte)
+{
     static const char hex[] = "0123456789ABCDEF";
     kprint("0x");
     char buf[3];
@@ -40,14 +41,17 @@ void isr_handler(int_frame_type *frame)
             pit_tick_handler();
 
             task_type *t = ready_queue;
-            do {
+            do
+            {
                 if (t->state == TASK_BLOCKED && t->sleep_until != 0
-                    && tick_count >= t->sleep_until) {
+                        && tick_count >= t->sleep_until)
+                {
                     t->state = TASK_READY;
                     t->sleep_until = 0;
                 }
                 t = t->next;
-            } while (t != ready_queue);
+            }
+            while (t != ready_queue);
 
             if (tick_count % 10 == 0)
             {

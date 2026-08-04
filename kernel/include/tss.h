@@ -3,7 +3,8 @@
 
 #include "types.h"
 
-typedef struct {
+typedef struct
+{
     u32 reserved0;
     u64 rsp0;
     u64 rsp1;

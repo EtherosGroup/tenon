@@ -24,7 +24,8 @@
 #define PT_IDX(va) (((u64)(va) >> 12) & 0x1FF)
 
 // 地址空间抽象
-typedef struct {
+typedef struct
+{
     u64  pml4_phys;
     u64 *pml4; // 通过递归映射访问的虚拟地址
 } address_space_type;
