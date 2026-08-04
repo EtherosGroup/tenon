@@ -18,15 +18,15 @@
 #define PTE_ADDR_MASK 0x000FFFFFFFFFF000ULL
 
 // 虚拟地址 -> 页表索引
-#define PML4_IDX(va) (((ku64)(va) >> 39) & 0x1FF)
-#define PDPT_IDX(va) (((ku64)(va) >> 30) & 0x1FF)
-#define PD_IDX(va) (((ku64)(va) >> 21) & 0x1FF)
-#define PT_IDX(va) (((ku64)(va) >> 12) & 0x1FF)
+#define PML4_IDX(va) (((u64)(va) >> 39) & 0x1FF)
+#define PDPT_IDX(va) (((u64)(va) >> 30) & 0x1FF)
+#define PD_IDX(va) (((u64)(va) >> 21) & 0x1FF)
+#define PT_IDX(va) (((u64)(va) >> 12) & 0x1FF)
 
 // 地址空间抽象
 typedef struct {
-    ku64  pml4_phys;
-    ku64 *pml4; // 通过递归映射访问的虚拟地址
+    u64  pml4_phys;
+    u64 *pml4; // 通过递归映射访问的虚拟地址
 } address_space_type;
 
 extern address_space_type kernel_as;
@@ -39,16 +39,16 @@ void vmm_init(void);
 /**
  * 建立虚拟地址到物理地址的页表映射
  */
-void vmm_map_page(address_space_type *as, ku64 va, ku64 pa, ku64 flags);
+void vmm_map_page(address_space_type *as, u64 va, u64 pa, u64 flags);
 
 /**
  * 解除虚拟地址的页表映射
  */
-void vmm_unmap_page(address_space_type *as, ku64 va);
+void vmm_unmap_page(address_space_type *as, u64 va);
 
 /**
  * 查询虚拟地址对应的物理地址和权限
  */
-ku64 vmm_get_mapping(address_space_type *as, ku64 va);
+u64 vmm_get_mapping(address_space_type *as, u64 va);
 
 #endif

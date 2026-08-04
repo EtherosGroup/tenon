@@ -5,19 +5,19 @@
 #define null ((void*)0)
 #endif
 
-typedef enum { false = 0, true = 1 } kbool;
+typedef enum { false = 0, true = 1 } bool;
 
-typedef unsigned char ku8;
-typedef unsigned short ku16;
-typedef unsigned int ku32;
-typedef unsigned long long ku64;
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long long u64;
 
-typedef signed char ks8;
-typedef signed short ks16;
-typedef signed int ks32;
-typedef signed long long ks64;
+typedef signed char s8;
+typedef signed short s16;
+typedef signed int s32;
+typedef signed long long s64;
 
-typedef ku64 kuptr;
-typedef ku64 ksize_t;
+typedef u64 uptr;
+typedef u64 usize;
 
 #endif

@@ -9,27 +9,27 @@
 #define MULTIBOOT_MEMORY_AVAILABLE 1
 
 typedef struct {
-    ku32 total_size;
-    ku32 reserved;
+    u32 total_size;
+    u32 reserved;
 } multiboot_info_type;
 
 typedef struct {
-    ku32 type;
-    ku32 size;
+    u32 type;
+    u32 size;
 } multiboot_tag_type;
 
 typedef struct {
-    ku32 type;
-    ku32 size;
-    ku32 entry_size;
-    ku32 entry_version;
+    u32 type;
+    u32 size;
+    u32 entry_size;
+    u32 entry_version;
 } multiboot_tag_mmap_type;
 
 typedef struct {
-    ku64 base_addr;
-    ku64 length;
-    ku32 type;
-    ku32 reserved;
+    u64 base_addr;
+    u64 length;
+    u32 type;
+    u32 reserved;
 } multiboot_mmap_entry_type;
 
 #endif

@@ -3,7 +3,7 @@
 
 #define COM1 0x3F8
 
-static kbool is_transmit_empty(void)
+static bool is_transmit_empty(void)
 {
     return asm_inb(COM1 + 5) & 0x20;
 }
@@ -29,7 +29,7 @@ static void kputc(char c)
     asm_outb(COM1, c);
 }
 
-void kprint_hex(ku64 num)
+void kprint_hex(u64 num)
 {
     kprint("0x");
     if (num == 0) {
@@ -39,14 +39,14 @@ void kprint_hex(ku64 num)
     char buf[16];
     int i = 0;
     while (num) {
-        ku8 d = num & 0xF;
+        u8 d = num & 0xF;
         buf[i++] = d < 10 ? '0' + d : 'A' + d - 10;
         num >>= 4;
     }
     while (i--) kputc(buf[i]);
 }
 
-void kprint_dec(ku64 num)
+void kprint_dec(u64 num)
 {
     if (num == 0) {
         kputc('0');

@@ -25,7 +25,7 @@ static const char sc_ascii[128] = {
 
 void keyboard_handler(void)
 {
-    ku8 sc = asm_inb(KEYBOARD_DATA);
+    u8 sc = asm_inb(KEYBOARD_DATA);
 
     if (sc & 0x80)
         return;

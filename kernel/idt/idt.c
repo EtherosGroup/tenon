@@ -69,14 +69,14 @@ static void default_exception_handler(void)
     asm_halt();
 }
 
-void idt_set_gate(ku8 vector, void (*isr)(void), ku8 type, ku8 dpl)
+void idt_set_gate(u8 vector, void (*isr)(void), u8 type, u8 dpl)
 {
-    ku64 addr = (ku64)isr;
+    u64 addr = (u64)isr;
 
     idt[vector].low  = (addr & 0xFFFF)
-                     | ((ku64)KERNEL_CS << 16)
-                     | ((ku64)(type & 0xF) << 40)
-                     | ((ku64)(dpl & 3) << 45)
+                     | ((u64)KERNEL_CS << 16)
+                     | ((u64)(type & 0xF) << 40)
+                     | ((u64)(dpl & 3) << 45)
                      | (1ULL << 47)
                      | ((addr >> 16) & 0xFFFF) << 48;
 
@@ -86,12 +86,12 @@ void idt_set_gate(ku8 vector, void (*isr)(void), ku8 type, ku8 dpl)
 void idt_init(void)
 {
     // 对于0-47指向对应的isr
-    for (ku16 i = 0; i < 48; i++)
-        idt_set_gate((ku8)i, isr_table[i], IDT_GATE_INTERRUPT, 0);
+    for (u16 i = 0; i < 48; i++)
+        idt_set_gate((u8)i, isr_table[i], IDT_GATE_INTERRUPT, 0);
 
     // 向量48-255仍然指向默认处理器
-    for (ku16 i = 48; i < 256; i++)
-        idt_set_gate((ku8)i, default_exception_handler, IDT_GATE_INTERRUPT, 0);
+    for (u16 i = 48; i < 256; i++)
+        idt_set_gate((u8)i, default_exception_handler, IDT_GATE_INTERRUPT, 0);
 
     asm_lidt(idt, sizeof(idt));
 }

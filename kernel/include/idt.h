@@ -10,18 +10,18 @@
 
 typedef struct 
 {
-    ku64 low;
-    ku64 high;
+    u64 low;
+    u64 high;
 } __attribute__((packed)) idt_gate_type;
 
-void idt_set_gate(ku8 vector, void (*isr)(void), ku8 type, ku8 dpl);
+void idt_set_gate(u8 vector, void (*isr)(void), u8 type, u8 dpl);
 void idt_init(void);
 
 typedef struct {
-    ku64 rax, rbx, rcx, rdx, rsi, rdi, rbp, r8, r9, r10, r11, r12, r13, r14, r15;
-    ku64 vector;
-    ku64 error_code;
-    ku64 rip, cs, rflags, rsp, ss;
+    u64 rax, rbx, rcx, rdx, rsi, rdi, rbp, r8, r9, r10, r11, r12, r13, r14, r15;
+    u64 vector;
+    u64 error_code;
+    u64 rip, cs, rflags, rsp, ss;
 } __attribute__((packed)) int_frame_type;
 
 void isr_handler(int_frame_type *frame);

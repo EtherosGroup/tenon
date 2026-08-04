@@ -24,7 +24,7 @@ void pic_init(void)
     asm_outb(PIC2_DATA, 0xFF);
 }
 
-void pic_eoi(ku8 irq)
+void pic_eoi(u8 irq)
 {
     if (irq >= 8)
     // irq >= 8 说明是从片发的，此时先发从片后再发主片
@@ -49,14 +49,14 @@ void pic_eoi(ku8 irq)
  */
 
 
-void pic_mask(ku8 irq)
+void pic_mask(u8 irq)
 {
-    ku16 port = (irq < 8) ? PIC1_DATA : PIC2_DATA;
+    u16 port = (irq < 8) ? PIC1_DATA : PIC2_DATA;
     asm_outb(port, asm_inb(port) | (1 << (irq & 7)));
 }
 
-void pic_unmask(ku8 irq)
+void pic_unmask(u8 irq)
 {
-    ku16 port = (irq < 8) ? PIC1_DATA : PIC2_DATA;
+    u16 port = (irq < 8) ? PIC1_DATA : PIC2_DATA;
     asm_outb(port, asm_inb(port) & ~(1 << (irq & 7)));
 }

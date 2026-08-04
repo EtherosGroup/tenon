@@ -7,8 +7,8 @@ void kprint(char chars[]);
 
 void kprintln(char chars[]);
 
-void kprint_hex(ku64 num);
+void kprint_hex(u64 num);
 
-void kprint_dec(ku64 num);
+void kprint_dec(u64 num);
 
 #endif

@@ -4,17 +4,17 @@
 #include "types.h"
 
 /* I/O Port Operations (x86 only) */
-ku8  asm_inb(ku16 port);
-void asm_outb(ku16 port, ku8 value);
-ku16 asm_inw(ku16 port);
-void asm_outw(ku16 port, ku16 value);
-ku32 asm_inl(ku16 port);
-void asm_outl(ku16 port, ku32 value);
+u8  asm_inb(u16 port);
+void asm_outb(u16 port, u8 value);
+u16 asm_inw(u16 port);
+void asm_outw(u16 port, u16 value);
+u32 asm_inl(u16 port);
+void asm_outl(u16 port, u32 value);
 void asm_io_wait(void);
 
 /* MSR Operations (x86 only) */
-ku64 asm_rdmsr(ku32 msr);
-void asm_wrmsr(ku32 msr, ku64 value);
+u64 asm_rdmsr(u32 msr);
+void asm_wrmsr(u32 msr, u64 value);
 
 /* Control Register Operations */
 unsigned long asm_read_cr0(void);
@@ -28,9 +28,9 @@ void asm_write_cr4(unsigned long value);
 /* CPUID */
 void asm_cpuid
 (
-    ku32 leaf, ku32 subleaf,
-    ku32 *eax, ku32 *ebx,
-    ku32 *ecx, ku32 *edx
+    u32 leaf, u32 subleaf,
+    u32 *eax, u32 *ebx,
+    u32 *ecx, u32 *edx
 );
 
 /* Instruction Wrappers */
@@ -49,23 +49,23 @@ unsigned long asm_read_rflags(void);
 void asm_write_rflags(unsigned long flags);
 
 /* Timestamp Counter */
-ku64 asm_rdtsc(void);
-ku64 asm_rdtscp(ku32 *aux);
+u64 asm_rdtsc(void);
+u64 asm_rdtscp(u32 *aux);
 
 /* Atomic Exchange */
-ku32 asm_xchg(volatile ku32 *ptr, ku32 value);
+u32 asm_xchg(volatile u32 *ptr, u32 value);
 
 /* Descriptor Table Operations */
-void asm_lgdt(void *ptr, ku16 size);
-void asm_lidt(void *ptr, ku16 size);
-void asm_ltr(ku16 sel);
+void asm_lgdt(void *ptr, u16 size);
+void asm_lidt(void *ptr, u16 size);
+void asm_ltr(u16 sel);
 
 /* Segment Register Reads */
-ku16 asm_read_cs(void);
-ku16 asm_read_ds(void);
-ku16 asm_read_es(void);
-ku16 asm_read_fs(void);
-ku16 asm_read_gs(void);
-ku16 asm_read_ss(void);
+u16 asm_read_cs(void);
+u16 asm_read_ds(void);
+u16 asm_read_es(void);
+u16 asm_read_fs(void);
+u16 asm_read_gs(void);
+u16 asm_read_ss(void);
 
 #endif

@@ -11,8 +11,8 @@
  * @field length 区域长度（字节），不一定页对齐
  */
 typedef struct {
-    ku64 base;
-    ku64 length;
+    u64 base;
+    u64 length;
 } memory_region_type;
 
 /**
@@ -24,7 +24,7 @@ typedef struct {
  * @param magic GRUB/Multiboot2 魔数，EAX 传入
  * @param info_ptr Multiboot2 info 结构体物理地址，EBX 传入
  */
-void pmm_init(ku32 magic, ku64 info_ptr);
+void pmm_init(u32 magic, u64 info_ptr);
 
 /**
  * 分配一个 4 KiB 物理页框
@@ -35,7 +35,7 @@ void pmm_init(ku32 magic, ku64 info_ptr);
  *
  * @return 页对齐的物理地址，无可用页时返回 0
  */
-ku64 pmm_alloc_page(void);
+u64 pmm_alloc_page(void);
 
 /**
  * 在指定物理地址上限以下分配一个 4 KiB 物理页框
@@ -50,7 +50,7 @@ ku64 pmm_alloc_page(void);
  * @param max_phys 物理地址上限（含），分配返回的地址 <= max_phys
  * @return 页对齐的物理地址，无可用页时返回 0
  */
-ku64 pmm_alloc_page_below(ku64 max_phys);
+u64 pmm_alloc_page_below(u64 max_phys);
 
 /**
  * 释放一个物理页框
@@ -61,19 +61,19 @@ ku64 pmm_alloc_page_below(ku64 max_phys);
  *
  * @param phys_addr 由 pmm_alloc_page 返回的精确物理地址
  */
-void pmm_free_page(ku64 phys_addr);
+void pmm_free_page(u64 phys_addr);
 
 /**
  * 查询物理内存管理器可管理的物理页总数（含已用和空闲）
  * @return 总页框数（total_pages = max_phys / 4096 向上取整）
  */
-ku64 pmm_total_pages(void);
+u64 pmm_total_pages(void);
 
 /**
  * 查询当前空闲物理页数量
  * @return 空闲页框数
  */
-ku64 pmm_free_pages(void);
+u64 pmm_free_pages(void);
 
 /**
  * 获取可用物理内存区域列表（拷贝输出）
@@ -85,6 +85,6 @@ ku64 pmm_free_pages(void);
  * @param max_count 缓冲区最大条目数
  * @return 实际写入的条目数（不超过 max_count 且不超过实际区域数）
  */
-ku32 pmm_get_memory_regions(memory_region_type *regions, ku32 max_count);
+u32 pmm_get_memory_regions(memory_region_type *regions, u32 max_count);
 
 #endif

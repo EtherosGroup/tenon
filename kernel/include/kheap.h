@@ -7,10 +7,10 @@
 
 void  kheap_init(void);
 
-void *kmalloc(ku64 size);
+void *kmalloc(u64 size);
 
 void  kfree(void *ptr);
 
-void *krealloc(void *ptr, ku64 new_size);
+void *krealloc(void *ptr, u64 new_size);
 
 #endif

@@ -6,7 +6,7 @@
 
 task_type *current_task;
 task_type *ready_queue;
-static ku32 next_task_id = 1;
+static u32 next_task_id = 1;
 
 void task_init(void)
 {
@@ -37,18 +37,18 @@ task_type *task_create(void (*entry)(void), const char *name)
         return null;
     }
 
-    ku8 *stack = (ku8 *)kmalloc(PAGE_SIZE);
+    u8 *stack = (u8 *)kmalloc(PAGE_SIZE);
     if (!stack) {
         kprintln("[TASK] Failed to allocate kernel stack");
         kfree(task);
         return null;
     }
 
-    ku64 stack_top = (ku64)stack + PAGE_SIZE;
-    ku64 *sp = (ku64 *)(stack_top - 16);
+    u64 stack_top = (u64)stack + PAGE_SIZE;
+    u64 *sp = (u64 *)(stack_top - 16);
 
-    sp[0] = (ku64)task_start; // task_switch 的 ret 目标
-    sp[1] = (ku64)entry; // trampoline 的 pop %rdi 目标
+    sp[0] = (u64)task_start; // task_switch 的 ret 目标
+    sp[1] = (u64)entry; // trampoline 的 pop %rdi 目标
 
     task->id = next_task_id++;
     task->state = TASK_READY;

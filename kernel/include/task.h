@@ -11,17 +11,17 @@ typedef enum {
 } task_state_type;
 
 typedef struct {
-    ku64 r15;
-    ku64 r14;
-    ku64 r13;
-    ku64 r12;
-    ku64 rbx;
-    ku64 rbp;
-    ku64 rsp;
+    u64 r15;
+    u64 r14;
+    u64 r13;
+    u64 r12;
+    u64 rbx;
+    u64 rbp;
+    u64 rsp;
 } task_context_type;
 
 typedef struct task_struct {
-    ku32 id;
+    u32 id;
     task_state_type state;
     task_context_type context;
     void *kernel_stack;

@@ -6,7 +6,7 @@
 #include "pit.h"
 #include "task.h"
 
-static void hex_print(ku8 byte) {
+static void hex_print(u8 byte) {
     static const char hex[] = "0123456789ABCDEF";
     kprint("0x");
     char buf[3];
@@ -20,7 +20,7 @@ static void hex_print(ku8 byte) {
 static void exception_handler(int_frame_type *frame)
 {
     kprint("Exception #");
-    hex_print((ku8)frame->vector);
+    hex_print((u8)frame->vector);
     kprint(" err=");
     // 需实现 hex64 打印 error_code... 先简化为只打 vector
     kprintln("");
@@ -35,7 +35,7 @@ void isr_handler(int_frame_type *frame)
     }
     else if (frame->vector >= IRQ_BASE)
     {
-        ku8 irq = frame->vector - IRQ_BASE;
+        u8 irq = frame->vector - IRQ_BASE;
         if (irq == 0)
         {
             pic_eoi(0);

@@ -16,13 +16,13 @@ static void mm_verify(void) {
     kprintln("===== MM Verification =====");
 
     /* --- PMM: alloc/free --- */
-    ku64 free_before = pmm_free_pages();
+    u64 free_before = pmm_free_pages();
 
-    ku64 p1 = pmm_alloc_page();
+    u64 p1 = pmm_alloc_page();
     if (!p1) { kprintln("[FAIL] pmm_alloc_page returned 0"); return; }
     kprint("[PASS] pmm_alloc_page -> "); kprint_hex(p1); kprintln("");
 
-    ku64 free_after_alloc = pmm_free_pages();
+    u64 free_after_alloc = pmm_free_pages();
     if (free_after_alloc != free_before - 1) {
         kprintln("[FAIL] free count mismatch after alloc");
         return;
@@ -36,19 +36,19 @@ static void mm_verify(void) {
     }
     kprintln("[PASS] pmm_free_page -> free count restored");
 
-    ku64 p2 = pmm_alloc_page();
+    u64 p2 = pmm_alloc_page();
     if (!p2) { kprintln("[FAIL] re-alloc after free failed"); return; }
     kprintln("[PASS] re-alloc after free");
 
     /* --- VMM: map / unmap / get_mapping --- */
-    ku64 pa = pmm_alloc_page();
+    u64 pa = pmm_alloc_page();
     if (!pa) { kprintln("[FAIL] pmm_alloc for vmm test"); return; }
-    ku64 va = KERNEL_HEAP_START + 0x100000;
-    ku64 flags = PTE_PRESENT | PTE_WRITABLE;
+    u64 va = KERNEL_HEAP_START + 0x100000;
+    u64 flags = PTE_PRESENT | PTE_WRITABLE;
 
     vmm_map_page(&kernel_as, va, pa, flags);
 
-    ku64 got_pa = vmm_get_mapping(&kernel_as, va);
+    u64 got_pa = vmm_get_mapping(&kernel_as, va);
     if (got_pa != pa) {
         kprintln("[FAIL] vmm_get_mapping mismatch");
         kprint("  expected: "); kprint_hex(pa); kprintln("");
@@ -70,13 +70,13 @@ static void mm_verify(void) {
     if (a != null) { kprintln("[FAIL] kmalloc(0) should return null"); return; }
     kprintln("[PASS] kmalloc(0) -> null");
 
-    ku8 *b = (ku8 *)kmalloc(128);
+    u8 *b = (u8 *)kmalloc(128);
     if (!b) { kprintln("[FAIL] kmalloc(128) returned null"); return; }
-    kprint("[PASS] kmalloc(128) -> "); kprint_hex((ku64)b); kprintln("");
+    kprint("[PASS] kmalloc(128) -> "); kprint_hex((u64)b); kprintln("");
 
-    for (int i = 0; i < 128; i++) b[i] = (ku8)(i & 0xFF);
+    for (int i = 0; i < 128; i++) b[i] = (u8)(i & 0xFF);
     for (int i = 0; i < 128; i++) {
-        if (b[i] != (ku8)(i & 0xFF)) {
+        if (b[i] != (u8)(i & 0xFF)) {
             kprintln("[FAIL] kmalloc: data corruption");
             return;
         }
@@ -109,7 +109,7 @@ static void mm_verify(void) {
     kprintln("===== ALL TESTS PASSED =====");
 }
 
-void start_kernel(ku32 magic, ku64 info_ptr)
+void start_kernel(u32 magic, u64 info_ptr)
 {
     kprint("\n");
     kprintln("Tenon v0.0.1");

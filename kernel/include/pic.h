@@ -18,16 +18,16 @@ void pic_init(void);
 /**
  * 发送 EOI（从片需同时发给主片）
  */
-void pic_eoi(ku8 irq);
+void pic_eoi(u8 irq);
 
 /**
  * 关闭IRQ线
  */
-void pic_mask(ku8 irq);
+void pic_mask(u8 irq);
 
 /**
  * 开启IRQ线
  */
-void pic_unmask(ku8 irq);
+void pic_unmask(u8 irq);
 
 #endif

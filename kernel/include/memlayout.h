@@ -9,18 +9,18 @@
 #define PAGE_SIZE 4096
 #define PAGE_SHIFT 12
 #define PAGE_MASK 0xFFFULL
-#define PAGE_ALIGN_UP(addr) (((ku64)(addr) + PAGE_MASK) & ~PAGE_MASK)
-#define PAGE_ALIGN_DOWN(addr) ((ku64)(addr) & ~PAGE_MASK)
-#define ADDR_TO_PAGE(addr) ((ku64)(addr) >> PAGE_SHIFT)
-#define PAGE_TO_ADDR(page) ((ku64)(page) << PAGE_SHIFT)
+#define PAGE_ALIGN_UP(addr) (((u64)(addr) + PAGE_MASK) & ~PAGE_MASK)
+#define PAGE_ALIGN_DOWN(addr) ((u64)(addr) & ~PAGE_MASK)
+#define ADDR_TO_PAGE(addr) ((u64)(addr) >> PAGE_SHIFT)
+#define PAGE_TO_ADDR(page) ((u64)(page) << PAGE_SHIFT)
 
-#define ALIGN_DOWN_2M(addr) ((ku64)(addr) & ~0x1FFFFFULL)
+#define ALIGN_DOWN_2M(addr) ((u64)(addr) & ~0x1FFFFFULL)
 
 /**
  * 内核物理边界，由 linker.ld 导出
  */
-extern ku8 __kernel_phys_start[];
-extern ku8 __kernel_phys_end[];
+extern u8 __kernel_phys_start[];
+extern u8 __kernel_phys_end[];
 
 /**
  * 虚拟地址布局
@@ -37,10 +37,10 @@ extern ku8 __kernel_phys_end[];
 #define KERNEL_HEAP_SIZE (64ULL * 1024ULL * 1024ULL)
 
 #define KERNEL_DIRECT_BASE 0xFFFFA00000000000ULL
-#define PHYS_TO_DIRECT(p) ((ku64)(p) + KERNEL_DIRECT_BASE)
-#define DIRECT_TO_PHYS(v) ((ku64)(v) - KERNEL_DIRECT_BASE)
+#define PHYS_TO_DIRECT(p) ((u64)(p) + KERNEL_DIRECT_BASE)
+#define DIRECT_TO_PHYS(v) ((u64)(v) - KERNEL_DIRECT_BASE)
 
 #define RECURSIVE_PML4_IDX 510
-#define PGTBL_VADDR(p4, p3, p2, p1) (0xFFFFULL << 48 | (ku64)(RECURSIVE_PML4_IDX) << 39 | (ku64)(p4) << 30 | (ku64)(p3) << 21 | (ku64)(p2) << 12 | (ku64)(p1) << 3)
+#define PGTBL_VADDR(p4, p3, p2, p1) (0xFFFFULL << 48 | (u64)(RECURSIVE_PML4_IDX) << 39 | (u64)(p4) << 30 | (u64)(p3) << 21 | (u64)(p2) << 12 | (u64)(p1) << 3)
 
 #endif
