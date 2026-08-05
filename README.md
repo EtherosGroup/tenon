@@ -19,6 +19,7 @@ Tenon的目标不是成为流行的操作系统，只是一群高中生闲的没
 ~~e.g. ```D:\Apps\qemu\qemu-system-x86_64.exe -kernel kernel.elf -serial stdio```~~（只运行内核已经无法满足目前的功能，使用iso请看下面的命令）
 
 e.g. ```D:\Apps\qemu\qemu-system-x86_64.exe -cdrom tenon.iso -serial stdio -m 128```
+> 如果要加载磁盘```img```文件直接使用QEMU的```-hda disk.img```类参数即可
 
 ## LICNECE
 Tenon 使用 Apache License 2.0 开源。
