@@ -157,14 +157,14 @@ void pmm_init(u32 magic, u64 info_ptr)
 
                 for (u32 i = 0; i < entry_count; i++)
                 {
-                    u64 end = entry[i].base_addr + entry[i].length;
-                    if (end > max_phys)
-                    {
-                        max_phys = end;
-                    }
-
                     if (entry[i].type == MULTIBOOT_MEMORY_AVAILABLE)
                     {
+                        u64 end = entry[i].base_addr + entry[i].length;
+                        if (end > max_phys)
+                        {
+                            max_phys = end;
+                        }
+
                         if (memory_region_count < MAX_MEMORY_REGIONS)
                         {
                             memory_regions[memory_region_count].base = entry[i].base_addr;

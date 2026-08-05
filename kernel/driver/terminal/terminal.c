@@ -97,6 +97,11 @@ void terminal_putchar(char c)
     {
         if (cursor_x > 0)
         {
+            u32 px = cursor_x * FONT_WIDTH;
+            u32 py = cursor_y * FONT_HEIGHT + FONT_HEIGHT - 1;
+            for (u32 col = 0; col < FONT_WIDTH; col++)
+                fb_put_pixel(px + col, py, term_bg);
+
             cursor_x--;
             terminal_draw_char(' ', cursor_x, cursor_y, term_bg, term_bg);
         }
@@ -155,4 +160,34 @@ void terminal_clear(void)
             terminal_draw_char(' ', x, y, term_bg, term_bg);
         }
     }
+}
+
+void terminal_draw_cursor(void)
+{
+    u32 px = cursor_x * FONT_WIDTH;
+    u32 py = cursor_y * FONT_HEIGHT + FONT_HEIGHT - 1;
+    for (u32 col = 0; col < FONT_WIDTH; col++)
+    {
+        fb_put_pixel(px + col, py, term_fg);
+    }
+}
+
+void terminal_cursor_left(void)
+{
+    if (cursor_x == 0) return;
+    u32 px = cursor_x * FONT_WIDTH;
+    u32 py = cursor_y * FONT_HEIGHT + FONT_HEIGHT - 1;
+    for (u32 col = 0; col < FONT_WIDTH; col++)
+        fb_put_pixel(px + col, py, term_bg);
+    cursor_x--;
+}
+
+void terminal_cursor_right(void)
+{
+    if (cursor_x + 1 >= term_cols) return;
+    u32 px = cursor_x * FONT_WIDTH;
+    u32 py = cursor_y * FONT_HEIGHT + FONT_HEIGHT - 1;
+    for (u32 col = 0; col < FONT_WIDTH; col++)
+        fb_put_pixel(px + col, py, term_bg);
+    cursor_x++;
 }

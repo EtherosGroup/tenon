@@ -20,19 +20,37 @@ static const char sc_ascii[128] =
     0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,
 };
 
 static char ring_buf[KEYBOARD_RING_SIZE];
 static volatile u32 ring_head;
 static volatile u32 ring_tail;
+static bool e0_prefix;
 
 void keyboard_handler(void)
 {
     u8 sc = asm_inb(KEYBOARD_DATA);
 
+    if (sc == 0xE0)
+    {
+        e0_prefix = true;
+        return;
+    }
+
     if (sc & 0x80)
     {
+        e0_prefix = false;
+        return;
+    }
+
+    if (e0_prefix)
+    {
+        e0_prefix = false;
+        if (sc == 0x4B) keyboard_ring_push(KEY_LEFT);
+        if (sc == 0x4D) keyboard_ring_push(KEY_RIGHT);
+        if (sc == 0x53) keyboard_ring_push(KEY_DELETE);
+        if (sc == 0x47) keyboard_ring_push(KEY_HOME);
+        if (sc == 0x4F) keyboard_ring_push(KEY_END);
         return;
     }
 
