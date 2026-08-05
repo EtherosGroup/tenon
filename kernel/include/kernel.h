@@ -17,5 +17,8 @@
 #include "fb.h"
 #include "terminal.h"
 #include "keyboard.h"
+#include "pci.h"
+#include "block.h"
+#include "ata.h"
 
 #endif

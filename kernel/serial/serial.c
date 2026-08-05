@@ -8,7 +8,7 @@ static bool is_transmit_empty(void)
     return asm_inb(COM1 + 5) & 0x20;
 }
 
-void serial_print(char chars[])
+void serial_print(const char chars[])
 {
     for (int i = 0; chars[i] != '\0'; i++)
     {
@@ -17,7 +17,7 @@ void serial_print(char chars[])
     }
 }
 
-void serial_println(char chars[])
+void serial_println(const char chars[])
 {
     serial_print(chars);
     serial_print("\n");

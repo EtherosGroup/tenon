@@ -1,3 +1,4 @@
 /build/
 **/tenon.iso
 **/kernel.elf
+**/disk.img

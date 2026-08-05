@@ -156,6 +156,13 @@ void start_kernel(u32 magic, u64 info_ptr)
     vmm_init();
     kheap_init();
 
+    pci_scan();
+
+    ata_init(ATA_PRIMARY_DATA,   ATA_PRIMARY_CTRL,   ATA_DRIVE_MASTER, "hda");
+    ata_init(ATA_PRIMARY_DATA,   ATA_PRIMARY_CTRL,   ATA_DRIVE_SLAVE,  "hdb");
+    ata_init(ATA_SECONDARY_DATA, ATA_SECONDARY_CTRL, ATA_DRIVE_MASTER, "hdc");
+    ata_init(ATA_SECONDARY_DATA, ATA_SECONDARY_CTRL, ATA_DRIVE_SLAVE,  "hdd");
+
     multiboot_tag_fb_type fb_tag;
     bool fb_valid;
     pmm_get_fb_tag(&fb_tag, &fb_valid);
