@@ -9,20 +9,20 @@
 static void hex_print(u8 byte)
 {
     static const char hex[] = "0123456789ABCDEF";
-    kprint("0x");
+    serial_print("0x");
     char buf[3];
     buf[0] = hex[byte >> 4];
     buf[1] = hex[byte & 0xF];
     buf[2] = '\0';
-    kprint(buf);
+    serial_print(buf);
 }
 
 static void exception_handler(int_frame_type *frame)
 {
-    kprint("Exception #");
+    serial_print("Exception #");
     hex_print((u8)frame->vector);
-    kprint(" err=");
-    kprintln("");
+    serial_print(" err=");
+    serial_println("");
     asm_halt();
 }
 

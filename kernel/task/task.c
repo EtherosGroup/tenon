@@ -15,7 +15,7 @@ void task_init(void)
     task_type *idle = (task_type *)kmalloc(sizeof(task_type));
     if (!idle)
     {
-        kprintln("[TASK] Failed to allocate idle task");
+        serial_println("[TASK] Failed to allocate idle task");
         asm_halt();
     }
 
@@ -31,7 +31,7 @@ void task_init(void)
     next_task_id = 1;
     dead_list = null;
 
-    kprintln("[TASK] Initialized.");
+    serial_println("[TASK] Initialized.");
 }
 
 task_type *task_create(void (*entry)(void *arg), void *arg, const char *name)
@@ -39,14 +39,14 @@ task_type *task_create(void (*entry)(void *arg), void *arg, const char *name)
     task_type *task = (task_type *)kmalloc(sizeof(task_type));
     if (!task)
     {
-        kprintln("[TASK] Failed to allocate task struct");
+        serial_println("[TASK] Failed to allocate task struct");
         return null;
     }
 
     u8 *stack = (u8 *)kmalloc(PAGE_SIZE);
     if (!stack)
     {
-        kprintln("[TASK] Failed to allocate kernel stack");
+        serial_println("[TASK] Failed to allocate kernel stack");
         kfree(task);
         return null;
     }

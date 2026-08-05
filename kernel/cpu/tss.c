@@ -9,7 +9,7 @@ void tss_init(void)
     tss_type *tss = (tss_type *)kmalloc(sizeof(tss_type));
     if (!tss)
     {
-        kprintln("[TSS] Failed to allocate TSS");
+        serial_println("[TSS] Failed to allocate TSS");
         asm_halt();
     }
 
@@ -25,7 +25,7 @@ void tss_init(void)
 
     if (!ist1_stack || !ist2_stack || !ist3_stack)
     {
-        kprintln("[TSS] Failed to allocate IST stacks");
+        serial_println("[TSS] Failed to allocate IST stacks");
         asm_halt();
     }
 
@@ -36,7 +36,7 @@ void tss_init(void)
     u64 *gdt = (u64 *)kmalloc(4 * 8);
     if (!gdt)
     {
-        kprintln("[TSS] Failed to allocate GDT");
+        serial_println("[TSS] Failed to allocate GDT");
         asm_halt();
     }
 
@@ -60,5 +60,5 @@ void tss_init(void)
     asm_lgdt(gdt, 4 * 8);
     asm_ltr(0x10);
 
-    kprintln("[TSS] Initialized.");
+    serial_println("[TSS] Initialized.");
 }

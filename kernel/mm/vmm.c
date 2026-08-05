@@ -28,7 +28,7 @@ static void pt_zero_page_direct(u64 phys)
 
 void vmm_init(void)
 {
-    /*
+    /**
      * 此时 CR3 仍指向 boot.S 中的 PML4
      * 第 1 GiB 有恒等映射，所以 phys < 1 GiB 的页面可以直接用物理地址当指针访问
      * 所有页表结构页面通过 pmm_alloc_page_below(1 GiB) 分配，确保可访问
@@ -95,7 +95,7 @@ void vmm_init(void)
 
     kernel_as.pml4_phys = pml4_phys;
 
-    kprintln("[VMM] Initialized.");
+    serial_println("[VMM] Initialized.");
 }
 
 void vmm_map_page(address_space_type *as, u64 va, u64 pa, u64 flags)

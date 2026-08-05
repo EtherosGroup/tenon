@@ -26,7 +26,7 @@ static bool grow_heap(u64 min_size)
 
     if (heap_top + needed > heap_end)
     {
-        kprintln("[KHEAP] Out of virtual address space.");
+        serial_println("[KHEAP] Out of virtual address space.");
         return false;
     }
 
@@ -35,7 +35,7 @@ static bool grow_heap(u64 min_size)
         u64 phys = pmm_alloc_page();
         if (!phys)
         {
-            kprintln("[KHEAP] Out of physical memory.");
+            serial_println("[KHEAP] Out of physical memory.");
             return true;
         }
         vmm_map_page(&kernel_as, heap_top + i * PAGE_SIZE, phys, PTE_PRESENT | PTE_WRITABLE | PTE_NX);
@@ -55,7 +55,7 @@ void kheap_init(void)
     free_list = null;
     heap_top = KERNEL_HEAP_START;
     heap_end = KERNEL_HEAP_START + KERNEL_HEAP_SIZE;
-    kprintln("[KHEAP] Initialized.");
+    serial_println("[KHEAP] Initialized.");
 }
 
 void *kmalloc(u64 size)

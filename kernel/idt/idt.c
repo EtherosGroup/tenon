@@ -66,7 +66,7 @@ static void (*isr_table[48])(void) =
 
 static void default_exception_handler(void)
 {
-    kprintln("Exception!");
+    serial_println("Exception!");
     asm_halt();
 }
 

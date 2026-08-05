@@ -126,9 +126,9 @@ void pmm_init(u32 magic, u64 info_ptr)
 
     if (magic != MULTIBOOT2_MAGIC)
     {
-        kprint("[PMM] No Multiboot2 (magic=");
-        kprint_hex(magic);
-        kprintln("), fallback: 128 MiB");
+        serial_print("[PMM] No Multiboot2 (magic=");
+        serial_print_hex(magic);
+        serial_println("), fallback: 128 MiB");
 
         max_phys = 128ULL * 1024 * 1024;
         memory_regions[0].base = 0;
@@ -218,7 +218,7 @@ void pmm_init(u32 magic, u64 info_ptr)
     }
     if (!bitmap_phys)
     {
-        kprintln("[PMM] No region large enough for bitmap, halting.");
+        serial_println("[PMM] No region large enough for bitmap, halting.");
         for (;;)
         {
             asm_hlt();
@@ -259,7 +259,7 @@ void pmm_init(u32 magic, u64 info_ptr)
     // 初始化 free_stack
     stack_top = 0;
 
-    kprintln("[PMM] Initialized.");
+    serial_println("[PMM] Initialized.");
 }
 
 

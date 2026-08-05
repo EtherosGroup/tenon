@@ -8,7 +8,7 @@ static bool is_transmit_empty(void)
     return asm_inb(COM1 + 5) & 0x20;
 }
 
-void kprint(char chars[])
+void serial_print(char chars[])
 {
     for (int i = 0; chars[i] != '\0'; i++)
     {
@@ -17,10 +17,10 @@ void kprint(char chars[])
     }
 }
 
-void kprintln(char chars[])
+void serial_println(char chars[])
 {
-    kprint(chars);
-    kprint("\n");
+    serial_print(chars);
+    serial_print("\n");
 }
 
 static void kputc(char c)
@@ -29,9 +29,9 @@ static void kputc(char c)
     asm_outb(COM1, c);
 }
 
-void kprint_hex(u64 num)
+void serial_print_hex(u64 num)
 {
-    kprint("0x");
+    serial_print("0x");
     if (num == 0)
     {
         kputc('0');
@@ -51,7 +51,7 @@ void kprint_hex(u64 num)
     }
 }
 
-void kprint_dec(u64 num)
+void serial_print_dec(u64 num)
 {
     if (num == 0)
     {

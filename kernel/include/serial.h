@@ -3,12 +3,12 @@
 
 #include "types.h"
 
-void kprint(char chars[]);
+void serial_print(char chars[]);
 
-void kprintln(char chars[]);
+void serial_println(char chars[]);
 
-void kprint_hex(u64 num);
+void serial_print_hex(u64 num);
 
-void kprint_dec(u64 num);
+void serial_print_dec(u64 num);
 
 #endif
