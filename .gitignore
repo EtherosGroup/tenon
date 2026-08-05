@@ -1,1 +1,3 @@
 /build/
+**/tenon.iso
+**/kernel.elf

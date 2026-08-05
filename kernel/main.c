@@ -1,47 +1,5 @@
 #include "kernel.h"
-
-static task_type *task_b_ptr;
-
-static void task_a(void *arg)
-{
-    (void)arg;
-    for (;;)
-    {
-        terminal_write("A");
-        task_sleep_ms(3000);
-        terminal_write("[wake B]");
-        task_wakeup(task_b_ptr);
-    }
-}
-
-static void task_b(void *arg)
-{
-    (void)arg;
-    task_b_ptr = current_task;
-    for (;;)
-    {
-        task_block();
-        terminal_write("B");
-    }
-}
-
-static void task_c(void *arg)
-{
-    (void)arg;
-    for (int i = 0; i < 100; i++)
-    {
-        terminal_write("C");
-    }
-    task_exit();
-}
-
-static void task_d(void *args)
-{
-    (void)args;
-    task_sleep_ms(3000);
-    terminal_clear();
-    terminal_write("666 Etheros NB");
-}
+#include "demo.h"
 
 /**
  * By DeepSeek v4 pro
@@ -220,10 +178,7 @@ void start_kernel(u32 magic, u64 info_ptr)
     tss_init();
     task_init();
 
-    task_create(task_a, null, "a");
-    task_create(task_b, null, "b");
-    task_create(task_c, null, "c");
-    task_create(task_d, null, "d");
+    demo();
 
     keyboard_ring_init();
     pic_init();
