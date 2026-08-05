@@ -7,9 +7,9 @@ static void task_a(void *arg)
     (void)arg;
     for (;;)
     {
-        kprint("A");
+        terminal_write("A");
         task_sleep_ms(3000);
-        kprint("[wake B]");
+        terminal_write("[wake B]");
         task_wakeup(task_b_ptr);
     }
 }
@@ -21,7 +21,7 @@ static void task_b(void *arg)
     for (;;)
     {
         task_block();
-        kprint("B");
+        terminal_write("B");
     }
 }
 
@@ -30,16 +30,26 @@ static void task_c(void *arg)
     (void)arg;
     for (int i = 0; i < 100; i++)
     {
-        kprint("C");
+        terminal_write("C");
     }
     task_exit();
 }
 
+static void task_d(void *args)
+{
+    (void)args;
+    task_sleep_ms(3000);
+    terminal_clear();
+    terminal_write("666 Etheros NB");
+}
+
+/**
+ * By DeepSeek v4 pro
+ */
 static void mm_verify(void)
 {
     kprintln("===== MM Verification =====");
 
-    /* --- PMM: alloc/free --- */
     u64 free_before = pmm_free_pages();
 
     u64 p1 = pmm_alloc_page();
@@ -76,7 +86,6 @@ static void mm_verify(void)
     }
     kprintln("[PASS] re-alloc after free");
 
-    /* --- VMM: map / unmap / get_mapping --- */
     u64 pa = pmm_alloc_page();
     if (!pa)
     {
@@ -111,7 +120,6 @@ static void mm_verify(void)
     kprintln("[PASS] vmm_unmap_page -> mapping cleared");
     pmm_free_page(pa);
 
-    /* --- KHEAP: alloc/free/realloc --- */
     void *a = kmalloc(0);
     if (a != null)
     {
@@ -181,20 +189,33 @@ static void mm_verify(void)
 
     kprintln("===== ALL TESTS PASSED =====");
 }
-
 void start_kernel(u32 magic, u64 info_ptr)
 {
     kprint("\n");
     kprintln("Tenon v0.0.1");
 
-    // mm
     pmm_init(magic, info_ptr);
     vmm_init();
     kheap_init();
 
-    // pit
-    pit_init(1000);
+    multiboot_tag_fb_type fb_tag;
+    bool fb_valid;
+    pmm_get_fb_tag(&fb_tag, &fb_valid);
+    if (fb_valid && fb_tag.fb_type == 1)
+    {
+        fb_init(fb_tag.fb_addr, fb_tag.fb_width, fb_tag.fb_height,
+                fb_tag.fb_pitch, fb_tag.fb_bpp,
+                fb_tag.fb_red_field_position, fb_tag.fb_red_mask_size,
+                fb_tag.fb_green_field_position, fb_tag.fb_green_mask_size,
+                fb_tag.fb_blue_field_position, fb_tag.fb_blue_mask_size);
+        terminal_init(fb_tag.fb_width, fb_tag.fb_height, COLOR_WHITE, COLOR_BLACK);
+    }
+    else
+    {
+        kprintln("[FB] No framebuffer tag, serial-only fallback");
+    }
 
+    pit_init(1000);
     idt_init();
     tss_init();
     task_init();
@@ -202,10 +223,12 @@ void start_kernel(u32 magic, u64 info_ptr)
     task_create(task_a, null, "a");
     task_create(task_b, null, "b");
     task_create(task_c, null, "c");
+    task_create(task_d, null, "d");
 
+    keyboard_ring_init();
     pic_init();
-    pic_unmask(0); // 开PIT
-    pic_unmask(1); // 开键盘
+    pic_unmask(0);
+    pic_unmask(1);
     asm_sti();
 
     mm_verify();

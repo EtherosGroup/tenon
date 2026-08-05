@@ -21,6 +21,18 @@ static u32 stack_top;
 static memory_region_type memory_regions[MAX_MEMORY_REGIONS];
 static u32 memory_region_count;
 
+static bool have_fb_tag;
+static multiboot_tag_fb_type saved_fb_tag;
+
+void pmm_get_fb_tag(multiboot_tag_fb_type *out, bool *valid)
+{
+    *valid = have_fb_tag;
+    if (have_fb_tag)
+    {
+        *out = saved_fb_tag;
+    }
+}
+
 /**
  * 将第 page 号页框标记为已用（bit 置 1）
  * page / 8 定位到字节，page % 8 定位到 bit
@@ -161,6 +173,15 @@ void pmm_init(u32 magic, u64 info_ptr)
                         }
                     }
                 }
+            }
+
+            if (tag->type == MULTIBOOT_TAG_FRAMEBUFFER)
+            {
+                multiboot_tag_fb_type *fb = (multiboot_tag_fb_type *)p;
+                saved_fb_tag = *fb;
+                saved_fb_tag.type = fb->type;
+                saved_fb_tag.size = fb->size;
+                have_fb_tag = true;
             }
 
             p += (tag->size + 7) & ~7U;

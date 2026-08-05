@@ -12,6 +12,15 @@ mb_header_start:
     .word 0
     .long 12
     .long _start
+    .long 0
+
+    .word 5
+    .word 0
+    .long 20
+    .long 0
+    .long 0
+    .long 32
+    .long 0
 
     .word 0
     .word 0
@@ -111,3 +120,4 @@ gdt64:
 gdt64_ptr:
     .word (gdt64_ptr - gdt64 - 1)
     .quad gdt64
+    

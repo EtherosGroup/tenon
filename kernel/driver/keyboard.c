@@ -1,6 +1,5 @@
 #include "asm.h"
-#include "serial.h"
-#include "types.h"
+#include "keyboard.h"
 
 #define KEYBOARD_DATA 0x60
 
@@ -24,6 +23,10 @@ static const char sc_ascii[128] =
     0,   0,   0,   0,   0,   0,   0,   0,
 };
 
+static char ring_buf[KEYBOARD_RING_SIZE];
+static volatile u32 ring_head;
+static volatile u32 ring_tail;
+
 void keyboard_handler(void)
 {
     u8 sc = asm_inb(KEYBOARD_DATA);
@@ -36,7 +39,44 @@ void keyboard_handler(void)
     char ch = sc_ascii[sc];
     if (ch)
     {
-        char buf[2] = {ch, '\0'};
-        kprint(buf);
+        keyboard_ring_push(ch);
     }
+}
+
+void keyboard_ring_init(void)
+{
+    ring_head = 0;
+    ring_tail = 0;
+}
+
+void keyboard_ring_push(char c)
+{
+    u32 next = (ring_head + 1) % KEYBOARD_RING_SIZE;
+    if (next == ring_tail)
+    {
+        return;
+    }
+    ring_buf[ring_head] = c;
+    ring_head = next;
+}
+
+char keyboard_ring_pop(void)
+{
+    char c = ring_buf[ring_tail];
+    ring_tail = (ring_tail + 1) % KEYBOARD_RING_SIZE;
+    return c;
+}
+
+bool keyboard_ring_empty(void)
+{
+    return ring_head == ring_tail;
+}
+
+char keyboard_readchar(void)
+{
+    while (keyboard_ring_empty())
+    {
+        asm_hlt();
+    }
+    return keyboard_ring_pop();
 }

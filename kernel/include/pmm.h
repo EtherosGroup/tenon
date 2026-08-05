@@ -2,6 +2,7 @@
 #define KERNEL_PMM_H
 
 #include "types.h"
+#include "multiboot.h"
 
 #define MAX_MEMORY_REGIONS 32
 
@@ -87,5 +88,7 @@ u64 pmm_free_pages(void);
  * @return 实际写入的条目数（不超过 max_count 且不超过实际区域数）
  */
 u32 pmm_get_memory_regions(memory_region_type *regions, u32 max_count);
+
+void pmm_get_fb_tag(multiboot_tag_fb_type *out, bool *valid);
 
 #endif

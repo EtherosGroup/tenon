@@ -14,7 +14,7 @@ OBJ_C = $(patsubst kernel/%.c, build/kernel/%.o, $(SRC_C))
 OBJ_S = $(patsubst kernel/%.S, build/kernel/%.o, $(SRC_S))
 OBJ   = $(OBJ_C) $(OBJ_S)
 
-.PHONY: all run clean
+.PHONY: all run clean iso
 
 all: build/kernel.elf
 
@@ -29,9 +29,15 @@ build/kernel/%.o: kernel/%.S
 build/kernel.elf: $(OBJ)
 	$(LD) $(LDFLAGS) $(OBJ) -o $@
 
+iso: all
+	@mkdir -p iso/boot
+	cp build/kernel.elf iso/boot/
+	grub-mkrescue -o tenon.iso iso/ 2>/dev/null
+	@echo "ISO generated: tenon.iso"
+
 run:
 	@echo "kernel built: build/kernel.elf"
 	@echo "Copy to Windows QEMU to run."
 
 clean:
-	rm -rf build/
+	rm -rf build/ tenon.iso

@@ -14,5 +14,8 @@
 #include "vmm.h"
 #include "kheap.h"
 #include "pit.h"
+#include "fb.h"
+#include "terminal.h"
+#include "keyboard.h"
 
 #endif
