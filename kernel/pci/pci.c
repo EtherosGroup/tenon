@@ -127,3 +127,56 @@ void pci_scan_class(u8 class_code, u8 subclass, pci_device_callback_type cb, voi
         }
     }
 }
+
+void pci_config_write(u8 bus, u8 device, u8 func, u8 offset, u32 value)
+{
+    u32 addr = pci_make_addr(bus, device, func, offset);
+    asm_outl(PCI_CONFIG_ADDR, addr);
+    asm_outl(PCI_CONFIG_DATA, value);
+}
+
+int pci_enable_bus_mastering(pci_device_type *dev)
+{
+    u32 cmd = pci_config_read(dev->bus, dev->device, dev->func, PCI_COMMAND);
+    cmd |= (PCI_CMD_BUSMASTER | PCI_CMD_MEMORY | PCI_CMD_IO);
+    pci_config_write(dev->bus, dev->device, dev->func, PCI_COMMAND, cmd);
+    return 0;
+}
+
+int pci_bar_type(u32 bar_value)
+{
+    if (bar_value & 0x1)
+    {
+        return PCI_BAR_IO;
+    }
+    switch ((bar_value >> 1) & 0x3)
+    {
+    case 0: return PCI_BAR_MMIO;
+    case 2: return PCI_BAR_MMIO_64;
+    default: return PCI_BAR_MMIO;
+    }
+}
+
+u64 pci_bar_address(pci_device_type *dev, int bar_index)
+{
+    u32 bar = dev->bar[bar_index];
+    int type = pci_bar_type(bar);
+
+    if (type == PCI_BAR_IO)
+    {
+        return (u64)(bar & ~0x3UL);
+    }
+    else if (type == PCI_BAR_MMIO_64)
+    {
+        if (bar_index + 1 < 6)
+        {
+            u32 bar_high = dev->bar[bar_index + 1];
+            return ((u64)bar_high << 32) | (u64)(bar & ~0xFUL);
+        }
+        return (u64)(bar & ~0xFUL);
+    }
+    else
+    {
+        return (u64)(bar & ~0xFUL);
+    }
+}

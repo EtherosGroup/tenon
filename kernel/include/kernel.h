@@ -20,5 +20,8 @@
 #include "pci.h"
 #include "block.h"
 #include "ata.h"
+#include "vfs.h"
+#include "ramfs.h"
+#include "mufs.h"
 
 #endif

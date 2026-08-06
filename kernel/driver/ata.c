@@ -76,30 +76,86 @@ static void ata_select_drive(ata_channel_type *ch, u64 lba)
     asm_outb(ch->drive_port, drive_byte);
 }
 
+static void ata_parse_string(u16 *id, int start, int len, char *out)
+{
+    for (int i = 0; i < len / 2; i++)
+    {
+        u16 w = id[start + i];
+        out[i * 2]     = (char)(w >> 8);
+        out[i * 2 + 1] = (char)(w & 0xFF);
+    }
+    out[len] = '\0';
+    for (int i = len - 1; i >= 0; i--)
+    {
+        if (out[i] == ' ')
+        {
+            out[i] = '\0';
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
+static int ata_do_identify(ata_channel_type *ch, u16 *id)
+{
+    asm_outb(ch->drive_port, ch->drive_select);
+    asm_io_wait();
+    asm_outb(ch->seccount_port, 0);
+    asm_outb(ch->lba_lo_port, 0);
+    asm_outb(ch->lba_mid_port, 0);
+    asm_outb(ch->lba_hi_port, 0);
+    asm_outb(ch->command_port, ATA_CMD_IDENTIFY);
+
+    u8 sr = asm_inb(ch->status_port);
+    if (sr == 0x00) return -1;
+
+    if (ata_wait_bsy(ch) != 0) return -1;
+
+    u8 mid = asm_inb(ch->lba_mid_port);
+    u8 hi = asm_inb(ch->lba_hi_port);
+    if (mid == 0x14 && hi == 0xEB) return -1;
+
+    if (ata_wait_drq(ch) != 0) return -1;
+
+    for (int i = 0; i < 256; i++)
+    {
+        id[i] = asm_inw(ch->data_port);
+    }
+    return 0;
+}
+
+static void ata_fill_info(u16 *id, block_dev_info_type *info)
+{
+    ata_parse_string(id, 27, 40, info->model);
+    ata_parse_string(id, 10, 20, info->serial);
+
+    info->max_sectors_per_io = id[47] & 0xFF;
+    if (info->max_sectors_per_io == 0)
+    {
+        info->max_sectors_per_io = 1;
+    }
+
+    info->features = BLOCK_FEAT_LBA48;
+}
+
 static int ata_read_sectors(block_device_type *dev, u64 lba, u32 count, void *buf)
 {
-    if (count == 0)
-    {
-        return 0;
-    }
+    if (count == 0) return 0;
 
-    ata_channel_type *ch = (ata_channel_type *)dev->priv;
+    ata_channel_type *ch = (ata_channel_type *)dev->driver_data;
 
-    if (ata_wait_bsy(ch) != 0)
-    {
-        return -1;
-    }
+    if (ata_wait_bsy(ch) != 0) return -1;
     asm_outb(ch->ctrl_port, 0x00);
 
     ata_select_drive(ch, lba);
 
-    // LBA48 high word
     asm_outb(ch->seccount_port, (u8)((count >> 8) & 0xFF));
     asm_outb(ch->lba_lo_port, (u8)((lba >> 24) & 0xFF));
     asm_outb(ch->lba_mid_port, (u8)((lba >> 32) & 0xFF));
     asm_outb(ch->lba_hi_port, (u8)((lba >> 40) & 0xFF));
 
-    // LBA48 low word
     asm_outb(ch->seccount_port, (u8)(count & 0xFF));
     asm_outb(ch->lba_lo_port, (u8)(lba & 0xFF));
     asm_outb(ch->lba_mid_port, (u8)((lba >> 8) & 0xFF));
@@ -111,10 +167,7 @@ static int ata_read_sectors(block_device_type *dev, u64 lba, u32 count, void *bu
 
     for (u32 sector = 0; sector < count; sector++)
     {
-        if (ata_wait_drq(ch) != 0)
-        {
-            return -1;
-        }
+        if (ata_wait_drq(ch) != 0) return -1;
 
         for (int i = 0; i < 256; i++)
         {
@@ -130,28 +183,20 @@ static int ata_read_sectors(block_device_type *dev, u64 lba, u32 count, void *bu
 
 static int ata_write_sectors(block_device_type *dev, u64 lba, u32 count, const void *buf)
 {
-    if (count == 0)
-    {
-        return 0;
-    }
+    if (count == 0) return 0;
 
-    ata_channel_type *ch = (ata_channel_type *)dev->priv;
+    ata_channel_type *ch = (ata_channel_type *)dev->driver_data;
 
-    if (ata_wait_bsy(ch) != 0)
-    {
-        return -1;
-    }
+    if (ata_wait_bsy(ch) != 0) return -1;
     asm_outb(ch->ctrl_port, 0x00);
 
     ata_select_drive(ch, lba);
 
-    // LBA48 high word
     asm_outb(ch->seccount_port, (u8)((count >> 8) & 0xFF));
     asm_outb(ch->lba_lo_port, (u8)((lba >> 24) & 0xFF));
     asm_outb(ch->lba_mid_port, (u8)((lba >> 32) & 0xFF));
     asm_outb(ch->lba_hi_port, (u8)((lba >> 40) & 0xFF));
 
-    // LBA48 low word
     asm_outb(ch->seccount_port, (u8)(count & 0xFF));
     asm_outb(ch->lba_lo_port, (u8)(lba & 0xFF));
     asm_outb(ch->lba_mid_port, (u8)((lba >> 8) & 0xFF));
@@ -163,10 +208,7 @@ static int ata_write_sectors(block_device_type *dev, u64 lba, u32 count, const v
 
     for (u32 sector = 0; sector < count; sector++)
     {
-        if (ata_wait_drq(ch) != 0)
-        {
-            return -1;
-        }
+        if (ata_wait_drq(ch) != 0) return -1;
 
         for (int i = 0; i < 256; i++)
         {
@@ -177,13 +219,40 @@ static int ata_write_sectors(block_device_type *dev, u64 lba, u32 count, const v
         asm_io_wait();
     }
 
-    if (ata_wait_bsy(ch) != 0)
-    {
-        return -2;
-    }
+    if (ata_wait_bsy(ch) != 0) return -2;
 
     return (int)count;
 }
+
+static int ata_flush(block_device_type *dev)
+{
+    (void)dev;
+    return 0;
+}
+
+static int ata_identify(block_device_type *dev, block_dev_info_type *info)
+{
+    ata_channel_type *ch = (ata_channel_type *)dev->driver_data;
+    u16 id[256];
+
+    if (ata_do_identify(ch, id) != 0) return -1;
+
+    ata_fill_info(id, info);
+
+    ata_parse_string(id, 27, 40, dev->info.model);
+    ata_parse_string(id, 10, 20, dev->info.serial);
+    dev->info.max_sectors_per_io = info->max_sectors_per_io;
+    dev->info.features = info->features;
+
+    return 0;
+}
+
+static const block_device_ops_type ata_ops = {
+    .read = ata_read_sectors,
+    .write = ata_write_sectors,
+    .flush = ata_flush,
+    .identify = ata_identify,
+};
 
 block_device_type *ata_init(u16 base, u16 ctrl, u8 drive_select, const char *name)
 {
@@ -206,7 +275,6 @@ block_device_type *ata_init(u16 base, u16 ctrl, u8 drive_select, const char *nam
     ch->ctrl_port = ctrl;
     ch->drive_select = drive_select;
 
-    // Select drive
     asm_outb(ch->drive_port, drive_select);
     asm_io_wait();
     asm_io_wait();
@@ -215,7 +283,6 @@ block_device_type *ata_init(u16 base, u16 ctrl, u8 drive_select, const char *nam
     serial_print(name);
     serial_print("... ");
 
-    // Check presence
     if (ata_wait_ready(ch) != 0)
     {
         serial_println("not present");
@@ -229,57 +296,18 @@ block_device_type *ata_init(u16 base, u16 ctrl, u8 drive_select, const char *nam
         return null;
     }
 
-    // Send IDENTIFY
-    asm_outb(ch->drive_port, drive_select);
-    asm_io_wait();
-    asm_outb(ch->seccount_port, 0);
-    asm_outb(ch->lba_lo_port, 0);
-    asm_outb(ch->lba_mid_port, 0);
-    asm_outb(ch->lba_hi_port, 0);
-    asm_outb(ch->command_port, ATA_CMD_IDENTIFY);
-
-    u8 sr = asm_inb(ch->status_port);
-    if (sr == 0x00)
-    {
-        serial_println("no device");
-        return null;
-    }
-
-    if (ata_wait_bsy(ch) != 0)
-    {
-        serial_println("timeout");
-        return null;
-    }
-
-    // Check for ATAPI
-    u8 mid = asm_inb(ch->lba_mid_port);
-    u8 hi  = asm_inb(ch->lba_hi_port);
-    if (mid == 0x14 && hi == 0xEB)
-    {
-        serial_println("ATAPI (skipped)");
-        return null;
-    }
-
-    if (ata_wait_drq(ch) != 0)
-    {
-        serial_println("no DRQ");
-        return null;
-    }
-
-    // Read IDENTIFY data (256 words)
     u16 id[256];
-    for (int i = 0; i < 256; i++)
+    if (ata_do_identify(ch, id) != 0)
     {
-        id[i] = asm_inw(ch->data_port);
+        serial_println("ATAPI or timeout");
+        return null;
     }
 
-    // LBA48 sectors: words 100-103
     u64 total_sectors = (u64)id[100]
     | ((u64)id[101] << 16)
     | ((u64)id[102] << 32)
     | ((u64)id[103] << 48);
 
-    // Fall back to LBA28: words 60-61
     if (total_sectors == 0)
     {
         total_sectors = (u64)id[60] | ((u64)id[61] << 16);
@@ -292,7 +320,7 @@ block_device_type *ata_init(u16 base, u16 ctrl, u8 drive_select, const char *nam
     block_device_type *dev = (block_device_type *)kmalloc(sizeof(block_device_type));
     if (!dev)
     {
-        serial_println("[ATA] Failed to allocate block_device_t");
+        serial_println("[ATA] Failed to allocate block_device_type");
         return null;
     }
 
@@ -306,10 +334,19 @@ block_device_type *ata_init(u16 base, u16 ctrl, u8 drive_select, const char *nam
 
     dev->sector_size = ATA_SECTOR_SIZE;
     dev->total_sectors = total_sectors;
-    dev->read = ata_read_sectors;
-    dev->write = ata_write_sectors;
-    dev->priv = ch;
+    dev->transport = BLOCK_TRANSPORT_ATA;
+    dev->ops = &ata_ops;
+    dev->driver_data = ch;
+
+    ata_fill_info(id, &dev->info);
+
+    serial_print("  model: ");
+    serial_println(dev->info.model);
+    serial_print("  serial: ");
+    serial_println(dev->info.serial);
+
     channel_count++;
+    block_register(dev);
 
     return dev;
 }

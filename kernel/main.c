@@ -156,12 +156,31 @@ void start_kernel(u32 magic, u64 info_ptr)
     vmm_init();
     kheap_init();
 
+    vfs_init();
+
+    vfs_sb_type *root_sb = ramfs_create_sb();
+    mufs_init();
+    mufs_mount(root_sb, "system", MUFST_SMP, 1);
+
+    mufs_set_var("temp", "/system/temp/");
+    mufs_set_var("home", "/system/home/");
+    mufs_set_var("config", "/system/config/");
+
+    vfs_mkdir("/system/temp");
+    vfs_mkdir("/system/home");
+    vfs_mkdir("/system/config");
+    vfs_mkdir("/system/kernel");
+
     pci_scan();
 
-    ata_init(ATA_PRIMARY_DATA,   ATA_PRIMARY_CTRL,   ATA_DRIVE_MASTER, "hda");
-    ata_init(ATA_PRIMARY_DATA,   ATA_PRIMARY_CTRL,   ATA_DRIVE_SLAVE,  "hdb");
+    ata_init(ATA_PRIMARY_DATA, ATA_PRIMARY_CTRL, ATA_DRIVE_MASTER, "hda");
+    ata_init(ATA_PRIMARY_DATA, ATA_PRIMARY_CTRL, ATA_DRIVE_SLAVE,  "hdb");
     ata_init(ATA_SECONDARY_DATA, ATA_SECONDARY_CTRL, ATA_DRIVE_MASTER, "hdc");
     ata_init(ATA_SECONDARY_DATA, ATA_SECONDARY_CTRL, ATA_DRIVE_SLAVE,  "hdd");
+
+    serial_print("[BLOCK] ");
+    serial_print_dec(block_device_count);
+    serial_println(" device(s) registered");
 
     multiboot_tag_fb_type fb_tag;
     bool fb_valid;
@@ -169,10 +188,10 @@ void start_kernel(u32 magic, u64 info_ptr)
     if (fb_valid && fb_tag.fb_type == 1)
     {
         fb_init(fb_tag.fb_addr, fb_tag.fb_width, fb_tag.fb_height,
-                fb_tag.fb_pitch, fb_tag.fb_bpp,
-                fb_tag.fb_red_field_position, fb_tag.fb_red_mask_size,
-                fb_tag.fb_green_field_position, fb_tag.fb_green_mask_size,
-                fb_tag.fb_blue_field_position, fb_tag.fb_blue_mask_size);
+            fb_tag.fb_pitch, fb_tag.fb_bpp,
+            fb_tag.fb_red_field_position, fb_tag.fb_red_mask_size,
+            fb_tag.fb_green_field_position, fb_tag.fb_green_mask_size,
+            fb_tag.fb_blue_field_position, fb_tag.fb_blue_mask_size);
         terminal_init(fb_tag.fb_width, fb_tag.fb_height, COLOR_WHITE, COLOR_BLACK);
     }
     else

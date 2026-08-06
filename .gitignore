@@ -2,3 +2,4 @@
 **/tenon.iso
 **/kernel.elf
 **/disk.img
+tools/mufs_write_ext.py
